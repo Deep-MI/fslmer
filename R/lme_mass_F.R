@@ -68,7 +68,7 @@ lme_mass_F<-function(stats,CM)
         if (Fstat<0) {Fstat = 0}
 
         F[i] = Fstat
-        pval[i] = max(1-pf(Fstat,szC,m), 1e-30)
+        pval[i] = max(1-stats::pf(Fstat,szC,m), 1e-30)
         contrast = C%*%Bhat
         sgn[i] = sign(contrast[1])
         df[,i] = matrix(c(szC,m),2)

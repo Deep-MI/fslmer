@@ -20,7 +20,7 @@ lme_mldivide<-function(A,B,ginv.do=TRUE,fallback=TRUE)
     
     if (ginv.do) 
     {
-        out<-ginv(t(A) %*% A) %*% t(A) %*% B
+        out<-MASS::ginv(t(A) %*% A) %*% t(A) %*% B
     } 
     else 
     {
@@ -68,7 +68,7 @@ lme_mldivide<-function(A,B,ginv.do=TRUE,fallback=TRUE)
                     print("solve() failed, falling back to ginv()")
                     tryCatch(
                     {
-                        out<-ginv(t(A) %*% A) %*% t(A) %*% B
+                        out<-MASS::ginv(t(A) %*% A) %*% t(A) %*% B
                         st<-1
                     }
                     ,error=function(e){print("We have an error here. Aborting.")}

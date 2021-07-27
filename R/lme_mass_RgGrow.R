@@ -78,7 +78,7 @@ lme_mass_RgGrow<-function(SphSurf,Re,Theta,maskvtx=NA,nst=2,prc=95)
                     # In addition the vertex's residuals must be correlated above 0.5
                     # with any other vertex's residual in the region.
                     
-                    if (min(min(cor(cbind(Re[,Rgvtxs[Rgind[i],1:Rgvtxs_lastind[Rgind[i]]]],Re[,adjvtxs[loc],drop=F]))))>= 0.5)
+                    if (min(min(stats::cor(cbind(Re[,Rgvtxs[Rgind[i],1:Rgvtxs_lastind[Rgind[i]]]],Re[,adjvtxs[loc],drop=F]))))>= 0.5)
                     {
                         Rgvtxs_lastind[Rgind[i]]<-Rgvtxs_lastind[Rgind[i]]+1
                         Rgsz<-Rgsz+1
@@ -264,7 +264,7 @@ lme_mass_RgGrow<-function(SphSurf,Re,Theta,maskvtx=NA,nst=2,prc=95)
         {
             Rgv<-which(Rgs==splRgs[i])
             RgParams<-Params[,Rgv,drop=F]
-            Rgstd[,i]<-sqrt(diag(var(t(RgParams))))
+            Rgstd[,i]<-sqrt(diag(stats::var(t(RgParams))))
             Rgstd[is.na(Rgstd)]<-0 # since var(0)==NA in R, unlike Matlab, where var(0)==0, KD
             nv<-length(Rgv)
             spp<-rowSums(coord[,Rgv,drop=F])/nv
@@ -443,15 +443,15 @@ lme_mass_RgGrow<-function(SphSurf,Re,Theta,maskvtx=NA,nst=2,prc=95)
         {
             RgParams<-Params[,Rgv,drop=F]
             mRgParams<-rowMeans(RgParams)
-            stRgParams<-sqrt(diag(var(t(RgParams))))
+            stRgParams<-sqrt(diag(stats::var(t(RgParams))))
             stRgParams[is.na(stRgParams)]<-0 # since var(0)==NA in R, unlike Matlab, where var(0)==0, KD
             thr<-nst*stRgParams
             np<-nrow(RgParams)
             nv<-ncol(RgParams)
             DistRgParams = abs(RgParams-kronecker(matrix(1,1,nv),mRgParams))
             
-            tmpcor<-cor(Re[,Rgv,drop=F]); if (length(tmpcor)>1) {diag(tmpcor)<-NA}; if (all(is.na(tmpcor))) {tmpcor<-FALSE} else {tmpcor<-(min(tmpcor,na.rm=T) >= 0.5)} # KD
-            # if ((sum(colSums(DistRgParams <= kronecker(matrix(1,1,nv),thr)) == np) >= prc*nv/100) && min(cor(Re[,Rgv,drop=F]),na.rm=T) >= 0.5) # KD
+            tmpcor<-stats::cor(Re[,Rgv,drop=F]); if (length(tmpcor)>1) {diag(tmpcor)<-NA}; if (all(is.na(tmpcor))) {tmpcor<-FALSE} else {tmpcor<-(min(tmpcor,na.rm=T) >= 0.5)} # KD
+            # if ((sum(colSums(DistRgParams <= kronecker(matrix(1,1,nv),thr)) == np) >= prc*nv/100) && min(stats::cor(Re[,Rgv,drop=F]),na.rm=T) >= 0.5) # KD
             if ((sum(colSums(DistRgParams <= kronecker(matrix(1,1,nv),thr)) == np) >= prc*nv/100) && tmpcor) # KD
             {
                 tf<-TRUE

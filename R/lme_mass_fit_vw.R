@@ -4,16 +4,6 @@ lme_mass_fit_vw<-function(X,Zcols,Y,ni,maskvtx=NA,fname=NA,prs=1,e=10^-1,Xrows=N
     
     # check if parallel computing is feasible
     
-    if (numcore>1 & !exists("mclapply")) 
-    {
-        st<-require(parallel)
-        
-        if (!st) stop("Please install the 'parallel' package or set numcore=1")
-        
-        print("loading 'parallel' package")
-    
-    }
-    
     if (numcore==1) print("No parallel computing enabled (not recommended)",quote=F)
     
     #

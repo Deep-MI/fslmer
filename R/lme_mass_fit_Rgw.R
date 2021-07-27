@@ -4,14 +4,6 @@ lme_mass_fit_Rgw<-function(X,Zcols,Y,ni,Th0,Rgs,Surf,fname=NA,Dtype="euc",sptm="
     # --------------------------------------------------------------------------
     # check if parallel computing is feasible
     
-    if (prs>1 & !exists("mclapply")) 
-    {
-        st<-require(parallel)
-        
-        if (!st) stop("Please install the 'parallel' package or set prs=1")
-        
-    }
-    
     if (prs==1) print("No parallel computing enabled (not recommended)",quote=F)
     
     #
@@ -32,7 +24,7 @@ lme_mass_fit_Rgw<-function(X,Zcols,Y,ni,Th0,Rgs,Surf,fname=NA,Dtype="euc",sptm="
         }
         else
         {
-            if (Rgst && (lreml(end) < lreml(1)))
+            if (Rgst && (lreml[length(lreml)] < lreml[1]))
             {
                 print(paste('Region ', i, '/', i_N, ': Convergence to a saddle point at iteration ', length(lreml), '. Initial and final likelihoods: ', lreml[1], ', ', lreml[length(lreml)], '.',sep=""),quote=F)
             }
@@ -243,7 +235,7 @@ lme_mass_fit_Rgw<-function(X,Zcols,Y,ni,Th0,Rgs,Surf,fname=NA,Dtype="euc",sptm="
     
     if (prs>1)
     {
-        outEst<-mclapply(c(1:prs),function(x) do_estimate(x,prsnRg,Rgs,bRgind,RgVtxInd,nRgvtx,Surf,maskvtx,Dtype,X,Zcols,Yj,Th0j,Dist,sptm,ni,e),mc.cores=prs) 
+        outEst<-parallel::mclapply(c(1:prs),function(x) do_estimate(x,prsnRg,Rgs,bRgind,RgVtxInd,nRgvtx,Surf,maskvtx,Dtype,X,Zcols,Yj,Th0j,Dist,sptm,ni,e),mc.cores=prs) 
                 
         for (j in c(1:prs))
         {

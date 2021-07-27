@@ -21,7 +21,7 @@ lme_R<-function(lrmlfull,lrmlred,q)
     n2<-1000000
     
     lrstats<-NULL
-    lrstats$pval<-sum(c(rchisq(n=n1,df=q),rchisq(n=n2,df=(q+1)))>G)/(n1+n2)
+    lrstats$pval<-sum(c(stats::rchisq(n=n1,df=q),stats::rchisq(n=n2,df=(q+1)))>G)/(n1+n2)
     lrstats$G<-G
     lrstats$df<-c(q,q+1)
     

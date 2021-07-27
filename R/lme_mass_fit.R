@@ -90,7 +90,7 @@ lme_mass_fit<-function(X,Xcols=NA,Xrows=NA,Zcols,Y,ni,prs=1,e=10^-1,numcore)
         {
             if (numcore>1)
             {
-                out<-mclapply(c(1:nv),build_the_model,Y,X,Xrows,Xcols,Zcols,ni,e,mc.cores=numcore)
+                out<-parallel::mclapply(c(1:nv),build_the_model,Y,X,Xrows,Xcols,Zcols,ni,e,mc.cores=numcore)
             }
         }
     
@@ -127,7 +127,7 @@ lme_mass_fit<-function(X,Xcols=NA,Xrows=NA,Zcols,Y,ni,prs=1,e=10^-1,numcore)
         {
             if (numcore>1)
             {
-            out<-mclapply(c(1:nv),build_the_model,Y,X,Xcols,Zcols,ni,e,mc.cores=numcore)
+            out<-parallel::mclapply(c(1:nv),build_the_model,Y,X,Xcols,Zcols,ni,e,mc.cores=numcore)
             }
         }
     }

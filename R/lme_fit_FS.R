@@ -55,7 +55,7 @@ lme_fit_FS<-function(X,Zcols,y,ni,e=10^-3)
     # --------------------------------------------------------------------------
     # Starting values
   
-    list2env(lme_fit_init(X,Zcols,y,ni),env=environment())
+    list2env(lme_fit_init(X,Zcols,y,ni),envir=environment())
     
     # Estimated random effects covariance matrix and its Cholesky decomposition
     D<-D0
@@ -125,10 +125,10 @@ lme_fit_FS<-function(X,Zcols,y,ni,e=10^-3)
             }
  
         # compute gradient; this will return 'gr'
-        list2env(lme_Gradient(X,Zcols,W,invH,L,phi,r,ni),env=environment())
+        list2env(lme_Gradient(X,Zcols,W,invH,L,phi,r,ni),envir=environment())
         
         # compute expected information; this will return 'EI' (and 'Pth', 'Qthth', but we don't need these)
-        list2env(lme_EI(X,Zcols,W,invH,SIGMA,L,phi,ni),env=environment())
+        list2env(lme_EI(X,Zcols,W,invH,SIGMA,L,phi,ni),envir=environment())
     
         # update theta
         theta[ind]<-theta[ind] + lme_mldivide(EI,gr,ginv.do=F) # check this

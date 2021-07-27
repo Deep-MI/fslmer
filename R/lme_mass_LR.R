@@ -17,7 +17,7 @@ lme_mass_LR<-function(statsfull,statsred,q)
     
     for (i in c(1:nv))
     {
-        lrstat<-lme_LR(statsfull[i]$lreml,statsred[i]$lreml,q)
+        lrstats<-lme_LR(statsfull[i]$lreml,statsred[i]$lreml,q)
         pval[i]<-lrstats$pval
     }
     

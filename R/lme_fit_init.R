@@ -1,6 +1,5 @@
 lme_fit_init<-function(X,Zcols,y,ni)
 {
-    library(MASS)
     
     # --------------------------------------------------------------------------
     # Initialize variables
@@ -15,7 +14,7 @@ lme_fit_init<-function(X,Zcols,y,ni)
     Z<-X[,Zcols,drop=F]
     
     # estimated vector of the population regression parameters
-    Bhat<-ginv(X,tol=0)%*%y
+    Bhat<-MASS::ginv(X,tol=0)%*%y
     
     # --------------------------------------------------------------------------
     #
@@ -39,7 +38,7 @@ lme_fit_init<-function(X,Zcols,y,ni)
         ri<-yi - Xi %*% Bhat
         
         #
-        t<-ginv(t(Zi) %*% Zi)
+        t<-MASS::ginv(t(Zi) %*% Zi)
         t1<-t1 + t
         bihat<-t %*% t(Zi) %*% ri
         t2<-t2 + t(yi) %*% yi- t(bihat) %*% t(Zi) %*% ri

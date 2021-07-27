@@ -1,22 +1,6 @@
 lme_mass_fit_init<-function(X,Zcols,Y,ni,maskvtx=NA,numcore=1)
 {
-    
-    #
-    
-    st<-require(MASS)
-    
-    if (!st) stop("MASS package is required for this analysis, please install.")
-    
-    # check if parallel computing is feasible
-    
-    if (numcore>1 & !exists("mclapply")) 
-    {
-        st<-require(parallel)
-        
-        if (!st) stop("Please install the 'parallel' package or set numcore=1")
-        
-    }
-    
+   
     if (numcore==1) print("No parallel computing enabled (not recommended)",quote=F)
     
     #
@@ -62,7 +46,7 @@ lme_mass_fit_init<-function(X,Zcols,Y,ni,maskvtx=NA,numcore=1)
     {
         posf<-posi+ni[i]-1
         Zi<-X[posi:posf,Zcols,drop=F]
-        t2<-ginv(t(Zi)%*%Zi) 
+        t2<-MASS::ginv(t(Zi)%*%Zi) 
         t[c(((i-1)*q+1):(i*q)),]<-t2
         t1<-t1+t2
         posi<-posf+1
@@ -72,7 +56,7 @@ lme_mass_fit_init<-function(X,Zcols,Y,ni,maskvtx=NA,numcore=1)
     
     print('Computing initial values ...',quote=F)
     
-    sinvX<-ginv(X)
+    sinvX<-MASS::ginv(X)
     Bhat<-sinvX%*%Y
     
     # define function for parallel processing    
@@ -130,7 +114,7 @@ lme_mass_fit_init<-function(X,Zcols,Y,ni,maskvtx=NA,numcore=1)
     {
         if (numcore>1)
         {
-            Theta1<-simplify2array(mclapply(c(1:nv),function(x) compute_theta(Bhat[,x,drop=F],Y[,x,drop=F],X,Zcols,phisqd,m),mc.cores=numcore))
+            Theta1<-simplify2array(parallel::mclapply(c(1:nv),function(x) compute_theta(Bhat[,x,drop=F],Y[,x,drop=F],X,Zcols,phisqd,m),mc.cores=numcore))
         }
     }
 

@@ -113,7 +113,7 @@ lme_mass_RgGradient<-function(X,Zcols,W,invH,L,phi,re,ni,invG,GDa,GDb)
     aux <- (-sum(diag(Maux1)))
     a1<-sum(ni)*aux
     a3<-ncol(X)*aux
-    gr(nth+2) <- (a1+a2-a3)/2
+    gr[nth+2]<-(a1+a2-a3)/2
     }
     else
     {

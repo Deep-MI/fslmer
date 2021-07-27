@@ -1,14 +1,6 @@
 lme_RgFSfit<-function(X,Zcols,Y,ni,Theta0,Dist,model='exp',e=0.1)
 {
-    # -------------------------------------------------------------------------
-    # check libraries
-    
-    st<-require(MASS)
-    
-    if (!st) stop("MASS package is required for this analysis, please install.")
-    
-    #
-    
+
     # -------------------------------------------------------------------------
     # Auxiliary functions
 

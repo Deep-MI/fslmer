@@ -28,7 +28,7 @@ lme_FSfit<-function(X,Zcols,y,ni,e=0.1)
     # --------------------------------------------------------------------------
     # Starting values
     
-    list2env(lme_fit_init(X,Zcols,y,ni),env=environment())
+    list2env(lme_fit_init(X,Zcols,y,ni),envir=environment())
     
     D<-D0
     phisq<-phisq0
@@ -85,10 +85,10 @@ lme_FSfit<-function(X,Zcols,y,ni,e=0.1)
         
         lreml<-0.5*(lreml-log(det(H)))
         
-        list2env(lme_Gradient(X,Zcols,W,invH,L,phi,r,ni),env=environment())
+        list2env(lme_Gradient(X,Zcols,W,invH,L,phi,r,ni),envir=environment())
         gr<-as.matrix(gr)
         
-        list2env(lme_EI(X,Zcols,W,invH,SIGMA,L,phi,ni),env=environment())
+        list2env(lme_EI(X,Zcols,W,invH,SIGMA,L,phi,ni),envir=environment())
         
         invEI<-lme_mldivide(EI,diag(nth),ginv.do=F)
         

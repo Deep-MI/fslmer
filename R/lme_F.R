@@ -60,7 +60,7 @@ lme_F<-function(stats,C)
 
 	#Computation of Pis,Qijs and the expected information matrix EI.
 
-	list2env(lme_EI(X,Zcols,W,CBhat,V,L,phi,ni),env=environment())
+	list2env(lme_EI(X,Zcols,W,CBhat,V,L,phi,ni),envir=environment())
 	
 	invEI = lme_mldivide(EI,diag(nth),ginv.do=F) # check this
 
@@ -108,7 +108,7 @@ lme_F<-function(stats,C)
     	F = 0
         }
 
-    pval = max(1-pf(F,szC,m))
+    pval = max(1-stats::pf(F,szC,m))
     sgn = sign(C %*% Bhat)
     df = c(szC,m)
     

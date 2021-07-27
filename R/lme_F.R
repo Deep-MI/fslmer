@@ -1,14 +1,24 @@
+#' Title
+#'
+#' @param stats
+#' @param C
+#'
+#' @return
+#' @export
+#'
+#' @examples
+
 lme_F<-function(stats,C)
 {
 	# --------------------------------------------------------------------------
-	
+
 	X = stats$X
 
 	if (ncol(C) != ncol(X))
 	    {
-	    stop(cat("The number of colums in C must be equal to the number of colums in the design matrix X")); 
+	    stop(cat("The number of colums in C must be equal to the number of colums in the design matrix X"));
 	    }
-	
+
 	p = ncol(X)
 	ni = stats$ni
 	Zcols = stats$Zcols
@@ -31,21 +41,21 @@ lme_F<-function(stats,C)
 	        jk = jk + 1
 	        uv = 0
 	        for (v in 1:q)
-	            { 
+	            {
 	            for (u in 1:v)
-	                {   
+	                {
 	                uv = uv + 1
-	                posi = 1; 
+	                posi = 1;
 	                SumR = 0
 	                for (i in 1:length(ni))
-	                    {  
+	                    {
 	                    posf = posi + ni[i] - 1
-	                    Xi = X[posi:posf,,drop=F]; 
-	                    Zi = Z[posi:posf,,drop=F]; 
+	                    Xi = X[posi:posf,,drop=F];
+	                    Zi = Z[posi:posf,,drop=F];
 	                    Wi = W[posi:posf,1:ni[i],drop=F]
-	                    Ekj = matrix(0,q,q); 
-	                    Ekj[k,j] = 1; 
-	                    Euv = matrix(0,q,q); 
+	                    Ekj = matrix(0,q,q);
+	                    Ekj[k,j] = 1;
+	                    Euv = matrix(0,q,q);
 	                    Euv[u,v] = 1
 	                    Ai = Zi %*% Ekj %*% Euv %*% t(Zi)
 	                    Ri = t(Xi) %*% Wi %*% (Ai+ t(Ai)) %*% Wi %*% Xi
@@ -53,7 +63,7 @@ lme_F<-function(stats,C)
 	                    posi = posf + 1
 	                    }
 	                Rthth[jk,uv,,] = SumR
-	                }           
+	                }
 	            }
 	        }
 	    }
@@ -61,15 +71,15 @@ lme_F<-function(stats,C)
 	#Computation of Pis,Qijs and the expected information matrix EI.
 
 	list2env(lme_EI(X,Zcols,W,CBhat,V,L,phi,ni),envir=environment())
-	
+
 	invEI = lme_mldivide(EI,diag(nth),ginv.do=F) # check this
 
-	#Estimation of the bias in the covariance matrix and computation of the 
+	#Estimation of the bias in the covariance matrix and computation of the
 	#F-statistic and the degrees of freedom of the test.
 
 	Bias = 0
     OM = t(C) %*% solve(C %*% CBhat %*% t(C)) %*% C # check this
-    A1 = 0; 
+    A1 = 0;
     A2 = 0
     Term1 = OM %*% CBhat
     Term2 = CBhat %*% OM %*% CBhat
@@ -78,8 +88,8 @@ lme_F<-function(stats,C)
     	Pk = drop(Pth[k,,])
     	for (j in 1:nth)
     	    {
-            Qkj = drop(Qthth[k,j,,]); 
-            Rkj = drop(Rthth[k,j,,]);  
+            Qkj = drop(Qthth[k,j,,]);
+            Rkj = drop(Rthth[k,j,,]);
             Pj = drop(Pth[j,,])
             Bias = Bias + invEI[k,j] * (Qkj - Pk %*% CBhat %*% Pj - 0.25 * Rkj)
             A1 = A1 + invEI[k,j] %*% sum(diag(Term1 %*% Pk %*% CBhat)) * sum(diag(Term1 %*% Pj %*% CBhat))
@@ -101,7 +111,7 @@ lme_F<-function(stats,C)
     Bias = CBhat %*% Bias %*% CBhat
     CovBhat = CBhat + 2 * Bias
     Bhat = stats$Bhat
-    
+
     F = l * t(Bhat) %*% t(C) %*% solve(C %*% CovBhat %*% t(C)) %*% C %*% Bhat /szC # check this
     if (F<0)
         {
@@ -111,7 +121,7 @@ lme_F<-function(stats,C)
     pval = max(1-stats::pf(F,szC,m))
     sgn = sign(C %*% Bhat)
     df = c(szC,m)
-    
+
 	F_C<- list("F" = F,"pval" = pval,"sgn" = sgn,"df" = df)
     return(F_C)
 

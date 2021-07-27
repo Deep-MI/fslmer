@@ -1,22 +1,42 @@
+#' Title
+#'
+#' @param X
+#' @param Zcols
+#' @param Y
+#' @param ni
+#' @param Th0
+#' @param Rgs
+#' @param Surf
+#' @param fname
+#' @param Dtype
+#' @param sptm
+#' @param prs
+#' @param e
+#'
+#' @return
+#' @export
+#'
+#' @examples
+
 lme_mass_fit_Rgw<-function(X,Zcols,Y,ni,Th0,Rgs,Surf,fname=NA,Dtype="euc",sptm="exp",prs=1,e=0.1)
 {
-    
+
     # --------------------------------------------------------------------------
     # check if parallel computing is feasible
-    
+
     if (prs==1) print("No parallel computing enabled (not recommended)",quote=F)
-    
+
     #
-    
+
     # --------------------------------------------------------------------------
     # Auxiliary functions
-    
+
     # convergence
-    
+
     convergence<-function(Rgst,lreml,i,i_N=NA)
     {
         tf<-FALSE
-        
+
         if (Rgst  && (lreml[length(lreml)] >= lreml[1]))
         {
             print(paste('Region ', i, '/', i_N, ': Convergence at iteration ', length(lreml), '. Initial and final likelihoods: ', lreml[1], ', ', lreml[length(lreml)], '.',sep=""),quote=F)
@@ -36,19 +56,19 @@ lme_mass_fit_Rgw<-function(X,Zcols,Y,ni,Th0,Rgs,Surf,fname=NA,Dtype="euc",sptm="
 
         return(tf)
     }
-    
-    
+
+
     # balanceRgind
-    
+
     balanceRgind<-function(prs,nRg)
     {
         bRgind <- matrix(0,prs,ceiling(nRg/prs))
         prsnRg <- matrix(0,prs,1)
         reverse <- FALSE
-        
+
         i <- 1
         while (i <= nRg)
-        { 
+        {
             if (reverse)
             {
                 j <- prs
@@ -74,37 +94,37 @@ lme_mass_fit_Rgw<-function(X,Zcols,Y,ni,Th0,Rgs,Surf,fname=NA,Dtype="euc",sptm="
                 reverse <- TRUE
             }
         }
-    
-        # 
-    
+
+        #
+
         out<-NULL
         out$bRgind <- bRgind
         out$prsnRg <- prsnRg
         return(out)
-    
+
     }
-    
+
     # parallel processing
-    
+
     do_estimate<-function(j,prsnRg,Rgs,bRgind,RgVtxInd,nRgvtx,Surf,maskvtx,Dtype,X,Zcols,Yj,Th0j,Dist,sptm,ni,e)
     {
-        
+
         progress<-0
         posi<-0
-        
+
         for (i in c(1:prsnRg[j]))
         {
             RgVtxInd <- which(Rgs == bRgind[j,i])
             nRgvtx <- length(RgVtxInd)
             posf <- posi+nRgvtx
-            
+
             tryCatch(
-            {              
+            {
                 if (nRgvtx > 1)
                 {
                     Dist <- lme_mass_RgDist(Surf,maskvtx,RgVtxInd,Dtype)
-                    outRgFSfit<-lme_RgFSfit(X,Zcols,Yj[[j]][,(posi+1):posf,drop=F],ni,Th0j[[j]][,(posi+1):posf],Dist,sptm) 
-                        
+                    outRgFSfit<-lme_RgFSfit(X,Zcols,Yj[[j]][,(posi+1):posf,drop=F],ni,Th0j[[j]][,(posi+1):posf],Dist,sptm)
+
                     Rgstats[(posi+1):posf]<-outRgFSfit$stats
                     Rgsts[(posi+1):posf]<-outRgFSfit$st
                 }
@@ -119,27 +139,27 @@ lme_mass_fit_Rgw<-function(X,Zcols,Y,ni,Th0,Rgs,Surf,fname=NA,Dtype="euc",sptm="
             },
                  error=function(e){print(paste("Region ", bRgind[j,i], ': did not run',e,sep=""),quote=F)}
             )
-            
+
             posi <- posf
-            
+
         }
-        
+
         # output
 
         out<-NULL
-        
+
         out$Rgstats<-Rgstats
         out$Rgsts<-Rgsts
-        
+
         return(out)
     }
-    
+
     # --------------------------------------------------------------------------
     # Main function
-    
+
     n<-sum(ni)
     nv0<-ncol(Y)
-    
+
     # to make slightly different two vertices with same coord in FreeSurfer meshes
     print("Note that coordinate adjustment in case of identical vertex locations is not yet supported.",quote=F) # check this
     # [~,loc] = unique(Surf.coord','rows');
@@ -151,14 +171,14 @@ lme_mass_fit_Rgw<-function(X,Zcols,Y,ni,Th0,Rgs,Surf,fname=NA,Dtype="euc",sptm="
     maskvtx<-which(Rgs!=0)
     nv<-length(maskvtx)
     Rgs<-Rgs[maskvtx]
-    
+
     Y <- Y[,maskvtx,drop=F]
     Th0<-Th0[,maskvtx,drop=F]
 
     Rgnums<-unique(sort(Rgs))
     nRg<-length(Rgnums)
     Rglth <- matrix(0,1,nRg)
-    
+
     for (i in c(1:nRg)) Rglth[i] <- sum(Rgs == Rgnums[i])
 
     # Sort regions by length in descend order
@@ -187,14 +207,14 @@ lme_mass_fit_Rgw<-function(X,Zcols,Y,ni,Th0,Rgs,Surf,fname=NA,Dtype="euc",sptm="
             prsnumloc[j] <- prsnumloc[j] + nRgvtx
         }
     }
-    
+
     nrf<-nrow(Th0)
-    
+
     Rgstats<-NULL
     Rgsts<-NULL
     Yj<-NULL
     Th0j<-NULL
-    
+
     for (j in c(1:prs))
     {
         Rgstats[[j]]<-vector("list",prsnumloc[j])
@@ -203,7 +223,7 @@ lme_mass_fit_Rgw<-function(X,Zcols,Y,ni,Th0,Rgs,Surf,fname=NA,Dtype="euc",sptm="
         Yj[j] <- list(matrix(0,n,prsnumloc[j]))
         Th0j[j] <- list(matrix(0,nrf,prsnumloc[j]))
     }
-    
+
     for (j in c(1:prs))
     {
         posi <- 0
@@ -228,21 +248,21 @@ lme_mass_fit_Rgw<-function(X,Zcols,Y,ni,Th0,Rgs,Surf,fname=NA,Dtype="euc",sptm="
     rm(Y,Th0)
 
     # Estimation
-    
+
     print('Starting model fitting at each region ...',quote=F)
-    
+
     sRgst <- 0
-    
+
     if (prs>1)
     {
-        outEst<-parallel::mclapply(c(1:prs),function(x) do_estimate(x,prsnRg,Rgs,bRgind,RgVtxInd,nRgvtx,Surf,maskvtx,Dtype,X,Zcols,Yj,Th0j,Dist,sptm,ni,e),mc.cores=prs) 
-                
+        outEst<-parallel::mclapply(c(1:prs),function(x) do_estimate(x,prsnRg,Rgs,bRgind,RgVtxInd,nRgvtx,Surf,maskvtx,Dtype,X,Zcols,Yj,Th0j,Dist,sptm,ni,e),mc.cores=prs)
+
         for (j in c(1:prs))
         {
             Rgstats[[j]]<-outEst[[j]]$Rgstats
-            Rgsts[[j]]<-outEst[[j]]$Rgsts        
+            Rgsts[[j]]<-outEst[[j]]$Rgsts
         }
-        
+
         rm(outEst)
     }
     else
@@ -250,10 +270,10 @@ lme_mass_fit_Rgw<-function(X,Zcols,Y,ni,Th0,Rgs,Surf,fname=NA,Dtype="euc",sptm="
         for (j in c(1:prs))
         {
             outEst<-do_estimate(j,prsnRg,Rgs,bRgind,RgVtxInd,nRgvtx,Surf,maskvtx,Dtype,X,Zcols,Yj,Th0j,Dist,sptm,ni,e)
-            
+
             Rgstats[[j]]<-outEst$Rgstats
             Rgsts[[j]]<-outEst$Rgsts
-            
+
             rm(outEst)
         }
     }
@@ -261,7 +281,7 @@ lme_mass_fit_Rgw<-function(X,Zcols,Y,ni,Th0,Rgs,Surf,fname=NA,Dtype="euc",sptm="
     #
 
     stats<-NULL
-    for (i in c(1:nv0)) stats[[i]] <- statstruct 
+    for (i in c(1:nv0)) stats[[i]] <- statstruct
 
     st <- matrix(NA,nv0,1)
 
@@ -273,8 +293,8 @@ lme_mass_fit_Rgw<-function(X,Zcols,Y,ni,Th0,Rgs,Surf,fname=NA,Dtype="euc",sptm="
             RgVtxInd <- which(Rgs == bRgind[j,i])
             nRgvtx <- length(RgVtxInd)
             posf <- posi+nRgvtx
-            Rgstatsji <- Rgstats[[j]][(posi+1):posf] 
-            Rgstsji <- Rgsts[[j]][(posi+1):posf] 
+            Rgstatsji <- Rgstats[[j]][(posi+1):posf]
+            Rgstsji <- Rgsts[[j]][(posi+1):posf]
 
             for (k in c(1:nRgvtx))
             {
@@ -283,16 +303,16 @@ lme_mass_fit_Rgw<-function(X,Zcols,Y,ni,Th0,Rgs,Surf,fname=NA,Dtype="euc",sptm="
                 st[maskvtx[RgVtxInd[k]]] <- Rgstsji[k]
             }
             posi <- posf
-        
+
         }
     }
 
     # Output
-    
+
     out<-NULL
     out$stats<-stats
     out$st<-st
-    
+
     return(out)
-    
+
 }

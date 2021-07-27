@@ -1,83 +1,97 @@
+#' Title
+#'
+#' @param SphSurf
+#' @param Re
+#' @param Theta
+#' @param maskvtx
+#' @param nst
+#' @param prc
+#'
+#' @return
+#' @export
+#'
+#' @examples
+
 lme_mass_RgGrow<-function(SphSurf,Re,Theta,maskvtx=NA,nst=2,prc=95)
 {
     # -------------------------------------------------------------------------
     # Auxiliary functions
-    
+
     # vtxwGrowing
-    
+
     vtxwGrowing<-function(Re,Params,coord,Adj,maskvtx,nst,prc)
     {
         # seeds
-        
+
         print('Computing seeds ...',quote=F)
         outSeeds<-seeds(Re[,maskvtx,drop=F],Params[,maskvtx,drop=F],coord[,maskvtx,drop=F],nst,prc)
         Rgs1<-outSeeds$Rgs
         Rgseed<-outSeeds$Rgseed
         Rgstd<-outSeeds$Rgstd
         Rgseed<-maskvtx[Rgseed]
-        
+
         ns<-length(Rgseed)
         print(paste(ns,'seeds were computed after splitting the surface'))
-        
+
         np<-nrow(Params)
         nv<-ncol(Params)
-        
+
         Rgs<-matrix(0,1,nv)
         Rgs[maskvtx]<-Rgs1
         notIncl<-matrix(TRUE,1,nv)
         notIncl[Rgs==0]<-FALSE
         notIncl[Rgseed]<-FALSE
-        maxRgsz<-90 # Do not form regions with size greater than maxRgsz 
+        maxRgsz<-90 # Do not form regions with size greater than maxRgsz
         Rgvtxs<-matrix(0,ns,maxRgsz)
         Rgvtxs[,1]<-Rgseed
         Rgvtxs_prvtxind<-matrix(0,1,ns)
         Rgvtxs_lastind<-matrix(1,1,ns)
         Rgind<-c(1:ns)
-        thr<-nst*Rgstd 
+        thr<-nst*Rgstd
         growing_ns<-ns
-        
+
         while (growing_ns>0)
         {
-            
+
             print(paste(growing_ns,'seeds for growing'),quote=F)
             print(paste('Current maximum region size',max(Rgvtxs_lastind),'vertices'))
-            
+
             i<-1
             while (i<=growing_ns)
             {
-                
+
                 Rgvtxs_prvtxind[Rgind[i]]<-Rgvtxs_prvtxind[Rgind[i]]+1
                 prvtx<-Rgvtxs[Rgind[i],Rgvtxs_prvtxind[Rgind[i]]]
                 RgParams<-Params[,Rgvtxs[Rgind[i],c(1:Rgvtxs_lastind[Rgind[i]]),drop=F],drop=F]
                 mRgParams<-rowMeans(RgParams)
                 Rgsz<-Rgvtxs_lastind[Rgind[i]]
-                
+
                 # processing the current vertex prvtx
                 adjvtxs<-Adj[prvtx,Adj[prvtx,,drop=F]>0]
-                
+
                 # try to include only the adjacent vertices not included in other regions or in this region itself
                 adjvtxs<-adjvtxs[notIncl[adjvtxs]]
-                
+
                 # try to include first the adjacent vertices with the param closest to the region mean param
-                loc<-which.min(colSums(abs(Params[,adjvtxs] - kronecker(matrix(1,1,length(adjvtxs)),mRgParams)))) 
+                loc<-which.min(colSums(abs(Params[,adjvtxs] - kronecker(matrix(1,1,length(adjvtxs)),mRgParams))))
                 NewRgParams<-cbind(RgParams,Params[,adjvtxs[loc]])
                 mNewRgParams<-rowMeans(NewRgParams)
                 nRgnv<-ncol(NewRgParams)
                 DistNewRgParams<-abs(NewRgParams-kronecker(matrix(1,1,nRgnv),mNewRgParams))
-                
+
                 # an adjacent vertex is included in the region if the difference
                 # between its params and the region mean params is bellow the
                 # threshold thr or if the region still contains a percent
                 # prc of vertices bellow the threshold.
-                
+
                 nadjv <- length(adjvtxs)
                 j <- 1
-                
+
                 while ((Rgsz<maxRgsz) && (j<=nadjv) && sum(colSums(DistNewRgParams<=kronecker(matrix(1,1,nRgnv),thr[,Rgind[i],drop=F])) == np) >= prc*(nRgnv)/100)
                 {
                     # In addition the vertex's residuals must be correlated above 0.5
                     # with any other vertex's residual in the region.
-                    
+
                     if (min(min(stats::cor(cbind(Re[,Rgvtxs[Rgind[i],1:Rgvtxs_lastind[Rgind[i]]]],Re[,adjvtxs[loc],drop=F]))))>= 0.5)
                     {
                         Rgvtxs_lastind[Rgind[i]]<-Rgvtxs_lastind[Rgind[i]]+1
@@ -87,12 +101,12 @@ lme_mass_RgGrow<-function(SphSurf,Re,Theta,maskvtx=NA,nst=2,prc=95)
                         RgParams<-Params[,Rgvtxs[Rgind[i],c(1:Rgvtxs_lastind[Rgind[i]])],drop=F]
                         mRgParams<-rowMeans(RgParams)
                     }
-                    
+
                     # adjvtxs<-c(adjvtxs[c(1:(loc-1))],adjvtxs[c((loc+1):length(adjvtxs))]) # KD
                     # changed since indexing in R is different from Matlab, KD
                     if ((((loc-1)>0)) & ((loc+1)<=length(adjvtxs)))
                     {
-                        adjvtxs<-c(adjvtxs[c(1:(loc-1))],adjvtxs[c((loc+1):length(adjvtxs))]) 
+                        adjvtxs<-c(adjvtxs[c(1:(loc-1))],adjvtxs[c((loc+1):length(adjvtxs))])
                     }
                     else
                     {
@@ -116,19 +130,19 @@ lme_mass_RgGrow<-function(SphSurf,Re,Theta,maskvtx=NA,nst=2,prc=95)
                     NewRgParams<-cbind(RgParams,Params[,adjvtxs[loc],drop=F])
                     mNewRgParams<-rowMeans(NewRgParams)
                     nRgnv<-ncol(NewRgParams)
-                    DistNewRgParams<-abs(NewRgParams-kronecker(matrix(1,1,nRgnv),mNewRgParams)) 
+                    DistNewRgParams<-abs(NewRgParams-kronecker(matrix(1,1,nRgnv),mNewRgParams))
                     j<-j+1
-                    
+
                 }
-                
+
                 #
-                
+
                 if ((Rgvtxs_prvtxind[Rgind[i]]==Rgvtxs_lastind[Rgind[i]]) || (Rgvtxs_lastind[Rgind[i]]==maxRgsz))
                 {
                     # Rgind<-c(Rgind[1:(i-1)],Rgind[(i+1):length(Rgind)]) # changed because indexing in R is different from Matlab, KD
                     if ((((i-1)>0)) & ((i+1)<=length(Rgind)))
                     {
-                        Rgind<-c(Rgind[c(1:(i-1))],Rgind[c((i+1):length(Rgind))]) 
+                        Rgind<-c(Rgind[c(1:(i-1))],Rgind[c((i+1):length(Rgind))])
                     }
                     else
                     {
@@ -154,29 +168,29 @@ lme_mass_RgGrow<-function(SphSurf,Re,Theta,maskvtx=NA,nst=2,prc=95)
                 {
                     i<-i+1
                 }
-                
+
             }
-            
+
         }
-        
+
         for (i in c(1:ns))
         {
             Rgs[Rgvtxs[i,1:Rgvtxs_lastind[i]]]<-i
         }
-        
+
         nni<-sum(notIncl)
         notInclv<-which(notIncl==1)
         Rgs[notInclv]<-c((ns+1):(ns+nni))
-        
+
         # try to add holes to their most similar adjacent homogeneous region
         print(paste(nni,'holes (unassigned vertices). Trying to form new regions among them or add them to their most similar adjacent region ...'),quote=F)
-        
+
         for (i in c(1:nni))
         {
-                          
+
             hadjvtxs<-Adj[notInclv[i],Adj[notInclv[i],,drop=F]>0]
-            
-            if (!(length(hadjvtxs)==0)) 
+
+            if (!(length(hadjvtxs)==0))
             {
                 closestdistRParams<-sum(abs(Params[,notInclv[i],drop=F]-rowMeans(Params[,Rgs==Rgs[hadjvtxs[1]],drop=F])))
                 nadjvtxs<-length(hadjvtxs)
@@ -184,24 +198,24 @@ lme_mass_RgGrow<-function(SphSurf,Re,Theta,maskvtx=NA,nst=2,prc=95)
                 while (j<=nadjvtxs)
                 {
                     distRParams<-sum(abs(Params[,notInclv[i],drop=F]-rowMeans(Params[,Rgs==Rgs[hadjvtxs[j]],drop=F])))
-                    if (distRParams<closestdistRParams) 
+                    if (distRParams<closestdistRParams)
                     {
                         closestdistRParams<-distRParams
                         m<-j
                     }
                     j<-j+1
                 }
-                
+
                 outMerge<-merge(Rgs,Re,Params,Rgs[notInclv[i]],Rgs[hadjvtxs[m]],nst,prc)
                 Rgs<-outMerge$Rgs
                 mrg<-outMerge$tf
-                
+
                 if (mrg) notIncl[notInclv[i]]<-0
-                
+
             }
-            
+
         }
-        
+
         nni<-sum(notIncl)
         if (nni>0)
         {
@@ -211,55 +225,55 @@ lme_mass_RgGrow<-function(SphSurf,Re,Theta,maskvtx=NA,nst=2,prc=95)
         {
             print('No holes (unassigned vertices) remained.',quote=F)
         }
-        
+
         # Output
-        
+
         return(Rgs)
-        
+
     }
-    
+
     #
-    
+
     # seeds
-    
+
     seeds<-function(Re,Params,coord,nst,prc)
     {
-        
+
         np<-nrow(Params)
         nv<-ncol(Params)
-        
+
         Rgs<-matrix(1,1,nv)
         spl<-TRUE
-        
+
         while (spl)
         {
-            
+
             # splRgs<-unique(Rgs)
             splRgs<-unique(sort(Rgs)) # KD
             ntospl<-length(splRgs)
             spltf<-matrix(0,1,ntospl)
             nRgs<-ntospl
-            
+
             for (i in c(1:ntospl))
             {
                 outSplit<-split(Rgs,Re,Params,coord,splRgs[i],nst,prc)
-                
+
                 Rgs<-outSplit$Rgs
                 spltf[i]<-outSplit$tf
                 nnRgs<-outSplit$nRnv
-                
+
                 nRgs<-nRgs+nnRgs
             }
             if (sum(spltf)==0) spl<-FALSE
-            
+
         }
-        
+
         # splRgs<-unique(Rgs)
         splRgs<-unique(sort(Rgs)) # KD
         nRgs<-length(splRgs)
         Rgseed<-matrix(0,1,nRgs)
         Rgstd<-matrix(0,np,nRgs)
-        
+
         for (i in c(1:nRgs))
         {
             Rgv<-which(Rgs==splRgs[i])
@@ -272,22 +286,22 @@ lme_mass_RgGrow<-function(SphSurf,Re,Theta,maskvtx=NA,nst=2,prc=95)
             loc<-which.min(colSums(abs(coord[,Rgv] - kronecker(matrix(1,1,nv),spp))))
             Rgseed[i]<-Rgv[loc]
         }
-        
+
         # Output
-        
+
         out<-NULL
         out$Rgs<-Rgs
         out$Rgseed<-Rgseed
         out$Rgstd<-Rgstd
-        
+
         return(out)
-        
+
     }
-    
+
     #
-    
+
     # split
-    
+
     split<-function(Rgs,Re,Params,coord,Rnum,nst,prc)
     {
 
@@ -332,16 +346,16 @@ lme_mass_RgGrow<-function(SphSurf,Re,Theta,maskvtx=NA,nst=2,prc=95)
                     }
                 }
             }
-            
+
             # Rnv<-unique(Rgs[Rvts])
             Rnv<-unique(sort(Rgs[Rvts])) # KD
             nRnv<-length(Rnv)-1
-            
+
             for (i in c(1:nRnv)) Rgs[Rvts[Rgs[Rvts]==Rnv[i+1]]]<-nR+i
-            
+
             Rgs[Rvts[Rgs[Rvts]==Rnv[1]]]<-Rnum
             mrgRgs<-c(Rnum,(nR+1):(nR+nRnv))
-            
+
             # merge homogeneous subregions
             nmtomrg<-length(mrgRgs)
             i<-1
@@ -365,28 +379,28 @@ lme_mass_RgGrow<-function(SphSurf,Re,Theta,maskvtx=NA,nst=2,prc=95)
                 {
                     i<-i+1
                 }
-                
+
             }
-            
+
             tf<-TRUE
-            
+
         }
-        
+
         # Output
-        
+
         out<-NULL
         out$Rgs<-Rgs
         out$tf<-tf
         out$nRnv<-nRnv
-        
+
         return(out)
-        
+
     }
-    
+
     #
-    
+
     # merge
-    
+
     merge<-function(Rgs,Re,Params,Rn1,Rn2,nst,prc)
     {
 
@@ -400,10 +414,10 @@ lme_mass_RgGrow<-function(SphSurf,Re,Theta,maskvtx=NA,nst=2,prc=95)
             Rkn<-Rn2
             Ren<-Rn1
         }
-        
+
         auxRgs<-Rgs
         auxRgs[auxRgs==Ren]<-Rkn
-        
+
         if (homogenity(Re,Params,auxRgs,Rkn,nst,prc))
         {
             Rgs<-auxRgs
@@ -413,31 +427,31 @@ lme_mass_RgGrow<-function(SphSurf,Re,Theta,maskvtx=NA,nst=2,prc=95)
         {
             tf<-FALSE
         }
-        
+
         # Output
-        
+
         out<-NULL
         out$Rgs<-Rgs
         out$tf<-tf
-        
+
         return(out)
-        
+
     }
-    
+
     #
-    
+
     # homogeneity
-    
+
     homogenity<-function(Re,Params,Rgs,Rn,nst,prc)
     {
-        
+
         tf<-FALSE
         maxRgsz<-90
-        
+
         # Regions with size greater than maxRgsz are not considered homogeneous
-        
+
         Rgv<-which(Rgs==Rn)
-        
+
         # if (length(Rgv)<=maxRgsz)
         if ((length(Rgv)>0) && (length(Rgv)<=maxRgsz)) # KD
         {
@@ -449,7 +463,7 @@ lme_mass_RgGrow<-function(SphSurf,Re,Theta,maskvtx=NA,nst=2,prc=95)
             np<-nrow(RgParams)
             nv<-ncol(RgParams)
             DistRgParams = abs(RgParams-kronecker(matrix(1,1,nv),mRgParams))
-            
+
             tmpcor<-stats::cor(Re[,Rgv,drop=F]); if (length(tmpcor)>1) {diag(tmpcor)<-NA}; if (all(is.na(tmpcor))) {tmpcor<-FALSE} else {tmpcor<-(min(tmpcor,na.rm=T) >= 0.5)} # KD
             # if ((sum(colSums(DistRgParams <= kronecker(matrix(1,1,nv),thr)) == np) >= prc*nv/100) && min(stats::cor(Re[,Rgv,drop=F]),na.rm=T) >= 0.5) # KD
             if ((sum(colSums(DistRgParams <= kronecker(matrix(1,1,nv),thr)) == np) >= prc*nv/100) && tmpcor) # KD
@@ -457,22 +471,22 @@ lme_mass_RgGrow<-function(SphSurf,Re,Theta,maskvtx=NA,nst=2,prc=95)
                 tf<-TRUE
             }
             rm(tmpcor)
-            
+
         }
-        
+
         # Output
-        
+
         return(tf)
-        
+
     }
-    
+
     #
-    
+
     # -------------------------------------------------------------------------
     # Main function
-    
+
     nv<-ncol(Theta)
-    
+
     if (all(is.na(maskvtx))) maskvtx<-c(1:nv)
 
     outAdjM<-lme_mass_AdjMtx(SphSurf,maskvtx)
@@ -482,17 +496,17 @@ lme_mass_RgGrow<-function(SphSurf,Re,Theta,maskvtx=NA,nst=2,prc=95)
     sphcoord<-t(cbind(outSphC$phi,outSphC$theta))
 
     Regions<-vtxwGrowing(Re,Theta,sphcoord,AdjM,maskvtx,nst,prc)
-    
+
     outRgMean<-lme_mass_RgMean(Regions,Theta)
-    
+
     # output
-    
+
     out<-NULL
     out$Regions<-Regions
     out$RgMeans<-outRgMean$RgMeans
-    
+
     return(out)
- 
+
 }
 
 #

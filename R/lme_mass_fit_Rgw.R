@@ -37,20 +37,20 @@ lme_mass_fit_Rgw<-function(X,Zcols,Y,ni,Th0,Rgs,Surf,fname=NA,Dtype="euc",sptm="
     {
         tf<-FALSE
 
-        if (Rgst  && (lreml[length(lreml)] >= lreml[1]))
+        if (Rgst  && (lreml[length(lreml)] >= lreml[0]))
         {
-            print(paste('Region ', i, '/', i_N, ': Convergence at iteration ', length(lreml), '. Initial and final likelihoods: ', lreml[1], ', ', lreml[length(lreml)], '.',sep=""),quote=F)
+            print(paste('Region ', i, '/', i_N, ': Convergence at iteration ', length(lreml), '. Initial and final likelihoods: ', lreml[0], ', ', lreml[length(lreml)], '.',sep=""),quote=F)
             tf<-TRUE
         }
         else
         {
-            if (Rgst && (lreml[length(lreml)] < lreml[1]))
+            if (Rgst && (lreml[length(lreml)] < lreml[0]))
             {
-                print(paste('Region ', i, '/', i_N, ': Convergence to a saddle point at iteration ', length(lreml), '. Initial and final likelihoods: ', lreml[1], ', ', lreml[length(lreml)], '.',sep=""),quote=F)
+                print(paste('Region ', i, '/', i_N, ': Convergence to a saddle point at iteration ', length(lreml), '. Initial and final likelihoods: ', lreml[0], ', ', lreml[length(lreml)], '.',sep=""),quote=F)
             }
             else
             {
-                print(paste('Region ', i, '/', i_N, ': Algorithm did not converge. Initial and final likelihoods: ', lreml[1], ', ', lreml[length(lreml)], '.', sep=""),quote=F)
+                print(paste('Region ', i, '/', i_N, ': Algorithm did not converge. Initial and final likelihoods: ', lreml[0], ', ', lreml[length(lreml)], '.', sep=""),quote=F)
             }
         }
 

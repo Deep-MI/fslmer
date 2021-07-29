@@ -9,11 +9,11 @@
 #'
 #' @return
 #' A list with spatially homogeneous regions and their means.
-#' 
+#'
 #' @export
 #'
 #' @examples
-#' RgGrow <- lme_mass_RgGrow(SphSurf, Re, Theta, maskvtx=NA, nst=2, prc=95)
+#' \dontrun{RgGrow <- lme_mass_RgGrow(SphSurf, Re, Theta, maskvtx=NA, nst=2, prc=95)}
 
 lme_mass_RgGrow<-function(SphSurf,Re,Theta,maskvtx=NA,nst=2,prc=95)
 {

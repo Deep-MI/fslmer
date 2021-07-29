@@ -18,5 +18,5 @@ vertex number is 0-based.
 Read FreeSurfer label files
 }
 \examples{
-labels <- lme_readlabel(filename)
+\dontrun{labels <- lme_readlabel(filename)}
 }

@@ -5,16 +5,16 @@
 #'
 #' @return
 #' This function returns a list with entries F, pval, sgn, and df.
-#' 
+#'
 #' @export
 #'
 #' @examples
-#' stats <- lme_fit_FS(X, [1, 2], y, ni)
-#' C <- c(0, 1, 0, 0)
-#' F <- lme_F(stats, C)
+#' \dontrun{stats <- lme_fit_FS(X, [1, 2], y, ni)}
+#' \dontrun{C <- c(0, 1, 0, 0)}
+#' \dontrun{F <- lme_F(stats, C)}
 
 lme_F<-function(stats, C) {
-  
+
 	# --------------------------------------------------------------------------
 
 	X = stats$X

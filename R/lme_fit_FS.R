@@ -6,18 +6,18 @@
 #' @param ni Vector indicating the repeated observations of each subject
 #' @param e Tolerance (default: 10^-3)
 #'
-#' @return 
-#' The function returns list of statistics, with the following entries: 
-#' Bhat, CovBhat, bihat, Covbihat, phisqhat, SIGMA, W, Dhat, X, Zcols, re, 
+#' @return
+#' The function returns list of statistics, with the following entries:
+#' Bhat, CovBhat, bihat, Covbihat, phisqhat, SIGMA, W, Dhat, X, Zcols, re,
 #' ni, and lreml.
-#' 
+#'
 #' @export
 #'
 #' @examples
-#' stats <- lme_fit_FS(X, [1, 2], y, ni)
+#' \dontrun{stats <- lme_fit_FS(X, [1, 2], y, ni)}
 
 lme_fit_FS<-function(X, Zcols, y, ni, e=10^-3) {
-    
+
     # --------------------------------------------------------------------------
     # Input checks
 

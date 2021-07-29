@@ -10,20 +10,20 @@
 #' @export
 #'
 #' @examples
-#' labels <- lme_readlabel(filename)
+#' \dontrun{labels <- lme_readlabel(filename)}
 
 lme_readlabel <- function(fname) {
-    
+
     fid <- file(fname, 'r')
-    
+
     readLines(fid, n=1)
-    
+
     nv <- scan(fid, what = integer(), n = 1)
-    
+
     d <- simplify2array(scan(fid, what=list(integer(), numeric(), numeric(), numeric(), numeric()), n=5*nv))
-    
+
     close(fid)
-    
+
     return(d)
-    
+
 }

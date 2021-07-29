@@ -11,27 +11,27 @@
 #' @param numcore Number of cores for parallel computing (default: 1)
 #'
 #' @return
-#' This function returns a list with the following parameters: 
+#' This function returns a list with the following parameters:
 #' Bhat, CovBhat, phisqhat, Dhat, X, Zcols, invEI, Pth, Qthth, lreml.
 
 #' @export
 #'
 #' @examples
-#' stats <- lme_mass_fit_vw(X, Zcols, Y, ni, numcore=1)
-    
-    
+#' \dontrun{stats <- lme_mass_fit_vw(X, Zcols, Y, ni, numcore=1)}
+
+
 lme_mass_fit_vw<-function(X,Zcols,Y,ni,maskvtx=NA,prs=1,e=10^-1,Xrows=NA,numcore=1) {
-    
+
     #
-    
+
     stats<-NULL
-    
+
     # check if parallel computing is feasible
-    
+
     if (numcore==1) print("No parallel computing enabled (not recommended)",quote=F)
-    
+
     #
-    
+
     nv0<-ncol(Y)
 
     if (any(is.na(maskvtx)))
@@ -41,26 +41,26 @@ lme_mass_fit_vw<-function(X,Zcols,Y,ni,maskvtx=NA,prs=1,e=10^-1,Xrows=NA,numcore
     }
 
     Y<-Y[,maskvtx,drop=F]
-    
+
     p<-ncol(X)
-    
+
     nv<-ncol(Y)
-    
+
     rfcols<-Zcols
     Zcols<-matrix(0,1,p)
     Zcols[,rfcols]<-matrix(1,1,length(rfcols))
-    
+
     if (!is.na(Xrows))
     {
         Xrows<-Xrows[,maskvtx]
     }
-    
+
     stats1<-lme_mass_fit(X,NA,Xrows,Zcols,Y,ni,prs,e,numcore)
-    
+
     for (i in c(1:nv))
     {
         stats[maskvtx[i]]<-stats1[i]
-    }        
-    
+    }
+
     return(stats)
 }

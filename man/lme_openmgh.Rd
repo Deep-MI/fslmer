@@ -17,5 +17,5 @@ x, v, ndim1, ndim2, ndim3, nframes, type, and dof.
 Read FreeSurfer image (mgh) files
 }
 \examples{
-mgh <- lme_openmgh(filename)
+\dontrun{mgh <- lme_openmgh(filename)}
 }

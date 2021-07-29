@@ -26,5 +26,5 @@ The function returns an initial model fit, i.e. a list with entries Bhat, Theta,
 Initialize model fit
 }
 \examples{
-fitInit <- lme_mass_fit_init(X=X, Zcols=[1, 2], y=y, ni=ni)
+\dontrun{fitInit <- lme_mass_fit_init(X=X, Zcols=[1, 2], y=y, ni=ni)}
 }

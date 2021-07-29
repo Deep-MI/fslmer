@@ -16,5 +16,5 @@ The function returns a list with entries vertices and faces.
 Read FreeSurfer surface files
 }
 \examples{
-surf <- lme_readsurf(filename)
+\dontrun{surf <- lme_readsurf(filename)}
 }

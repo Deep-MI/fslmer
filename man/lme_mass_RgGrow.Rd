@@ -26,5 +26,5 @@ A list with spatially homogeneous regions and their means.
 Region-growing algorithm to identify spatially homogeneous regions
 }
 \examples{
-RgGrow <- lme_mass_RgGrow(SphSurf, Re, Theta, maskvtx=NA, nst=2, prc=95)
+\dontrun{RgGrow <- lme_mass_RgGrow(SphSurf, Re, Theta, maskvtx=NA, nst=2, prc=95)}
 }

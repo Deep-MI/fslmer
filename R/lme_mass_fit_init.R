@@ -9,14 +9,14 @@
 #'
 #' @return
 #' The function returns an initial model fit, i.e. a list with entries Bhat, Theta, and Re.
-#' 
+#'
 #' @export
 #'
 #' @examples
-#' fitInit <- lme_mass_fit_init(X=X, Zcols=[1, 2], y=y, ni=ni)
+#' \dontrun{fitInit <- lme_mass_fit_init(X=X, Zcols=[1, 2], y=y, ni=ni)}
 
 lme_mass_fit_init<-function(X,Zcols,Y,ni,maskvtx=NA,numcore=1) {
-    
+
     #
 
     if (numcore==1) print("No parallel computing enabled (not recommended)",quote=F)

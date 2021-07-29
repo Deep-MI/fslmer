@@ -24,6 +24,8 @@ lme_mass_fit_Rgw(
 
 \item{Zcols}{Vector of random effect indices in design matrix}
 
+\item{Y}{Outcome variable}
+
 \item{ni}{Vector indicating the repeated observations of each subject}
 
 \item{Th0}{Output from \code{lme_mass_fit_init}}
@@ -41,8 +43,6 @@ lme_mass_fit_Rgw(
 \item{prs}{Number of cores for parallel computing (default: 1)}
 
 \item{e}{Tolerance (default: 10^-1)}
-
-\item{y}{Outcome variable}
 }
 \value{
 This function returns a list of lists, with entries st (=status) and stats,
@@ -53,5 +53,5 @@ Pth, Qthth, lreml
 Title
 }
 \examples{
-fitRgw <- lme_mass_fit_Rgw(X, Zcols, Y, ni, Th0, Rgs, Surf)
+\dontrun{fitRgw <- lme_mass_fit_Rgw(X, Zcols, Y, ni, Th0, Rgs, Surf)}
 }

@@ -43,5 +43,5 @@ Bhat, CovBhat, phisqhat, Dhat, X, Zcols, invEI, Pth, Qthth, lreml.
 Mass-univariate linear mixed-effects model fitting
 }
 \examples{
-stats <- lme_mass_fit_vw(X, Zcols, Y, ni, numcore=1)
+\dontrun{stats <- lme_mass_fit_vw(X, Zcols, Y, ni, numcore=1)}
 }

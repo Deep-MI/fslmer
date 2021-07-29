@@ -14,7 +14,7 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{stats <- lme_fit_FS(X, [1, 2], y, ni)}
+#' \dontrun{stats <- lme_fit_FS(X, Zcols, y, ni)}
 
 lme_fit_FS<-function(X, Zcols, y, ni, e=10^-3) {
 
@@ -28,7 +28,7 @@ lme_fit_FS<-function(X, Zcols, y, ni, e=10^-3) {
 
     if (!is.matrix(X)) stop("X must be a matrix")
     if (!is.matrix(y) || ncol(y)>1) stop("y must be a mx1 matrix")
-    if (!is.matrix(ni) || ncol(ni)>1) stop("y must be a sx1 matrix")
+    if (!is.matrix(ni) || ncol(ni)>1) stop("ni must be a sx1 matrix")
 
     if (nrow(X)!=nrow(y)) stop("X and y must have the same number of rows")
     if (nrow(X)!=sum(ni)) stop("X and sum(ni) do not match")

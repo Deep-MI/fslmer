@@ -57,7 +57,7 @@ lme_mass_RgGrow<-function(SphSurf,Re,Theta,maskvtx=NA,nst=2,prc=95)
         {
 
             print(paste(growing_ns,'seeds for growing'),quote=F)
-            print(paste('Current maximum region size',max(Rgvtxs_lastind),'vertices'))
+            print(paste('Current maximum region size',max(Rgvtxs_lastind),'vertices'),quote=F)
 
             i<-1
             while (i<=growing_ns)
@@ -83,7 +83,7 @@ lme_mass_RgGrow<-function(SphSurf,Re,Theta,maskvtx=NA,nst=2,prc=95)
                 DistNewRgParams<-abs(NewRgParams-kronecker(matrix(1,1,nRgnv),mNewRgParams))
 
                 # an adjacent vertex is included in the region if the difference
-                # between its params and the region mean params is bellow the
+                # between its params and the region mean params is below the
                 # threshold thr or if the region still contains a percent
                 # prc of vertices bellow the threshold.
 

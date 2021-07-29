@@ -46,107 +46,181 @@ There are two types of analyses that can be done: univariate and mass-univariate
 
 ### Univariate analyses
 
-Usually you should already have a longitudinal Qdec table containing the image/session ids, subject ids, time, and demographics. Using Freesurfer's `asegstats2table` and/or `aparcstats2table` tools, you can extract the volume and/or thickness estimates from the longitudinally processed data in your subjects directory:
+- Loading the data
+
+Usually you should already have a longitudinal Qdec table, which contains the subject IDs, image/observation/session IDs, time, and demographics (see https://surfer.nmr.mgh.harvard.edu/fswiki/LongitudinalStatistics for a description of the format). Using Freesurfer's `asegstats2table` and/or `aparcstats2table` tools, you can extract the volume and/or thickness estimates from the longitudinally processed data in your subjects directory:
 
 ```
-asegstats2table --qdec-long qdec.table.dat -t PATH_TO_QDEC_TABLE/aseg.long.table
+asegstats2table --qdec-long PATH_TO_QDEC_TABLE/qdec.table.dat -t PATH_TO_ANALYSIS_DIRECTORY/aseg.long.table
 ```
 
-The fslmer tools require the data ordered according to time for each individual (that is, your design matrix needs to have all the repeated assessments for the first subject, then all for the second and so on). Assume that your longitudinal Qdec table contains four columns: "fsid" (image ID), "fsid-base" (subject ID), "time" (time from baseline) and "group"(a binary variable), then you can use the following code:
+- Preparing the data
+
+Your longitudinal Qdec table needs to contain the "fsid-base" (subject ID) columns and "fsid" (image/observation/session ID), and should contain an additional column indicating time from baseline or the sequence of observations. Additional columns such as diagnoses, demographics, or covariates may also be present. For the current example, we assume that the timing info is stored in a numerical variable called 'time', indicating years from baseline, and that a categorical variable 'DX' indicates a diagnosis at baseline. You can used other names and/or additional variables in your analysis, but the example code has to be adapted accordingly.
+
+After loading the data, some further preparations are needed, including merging and sorting the data. In particular, the fslmer tools require the data ordered according to time for each individual (that is, your design matrix needs to have all the repeated assessments for the first subject, then all for the second and so on). 
 
 ```R
 # Load aseg/aparc and qdec tables into R:
-
 aseg <- read.table("PATH_TO_DATA/aseg.long.table", header=True)
 qdec <- read.table("PATH_TO_QDEC_TABLE/qdec.table.dat", header=True )
 
-# Create a set of auxiliary variables:
-# qdec ... ordered assessment variables
-# aseg ... ordered aseg table
-# Y    ... ordered data
-# ni   ... a matrix with the number of repeated measures for each subject
+# Read the qdec and aseg tables; note that R replaces '-' (and other characters) 
+# in variable names with '.'.
+qdec <- read.csv("adni-180-long-fs53-new.qdec")
+aseg <- read.csv("adni-180-long-fs53-new-aseg.csv")
 
-# Load auxiliary libraries
-library(plyr)
+# For the aseg table, split the longitudinal ID into fsid and fsid.base.
+aseg$fsid <- sub("\\.long\\..*", "", aseg$Measure.volume)
+aseg$fsid.base <- sub(".*\\.long\\.", "", aseg$Measure.volume)
 
-# Convert categorical strings into numeric values
-qdec["group"] <- factor(qdec$group, labels=c("CN"="1", "AD"="0"))
+# Merge qdec and aseg tables based on fsid and fsid.base variables; create new 
+# table 'dat'.
+dat <- merge(qdec, aseg, by=c("fsid.base", "fsid"))
 
-# Add columns fsid.base and time to the aseg dataframe
-aseg["fsid.base"] <- qdec$fsid.base
-aseg["time"] <- qdec$time
+# Sort the by 'fsid.base' and then by 'time'. 
+dat <- dat[order(dat$fsid.base, dat$Time.From.Baseline), ]
 
-# Sorts aseg and qdec dataframes first by fsid.base and then by time
-aseg <-aseg[order(fsid.base,time),]
-qdec <- qdec[order(fsid.base,time),]
+# Extract the structure of interest (here: volume of left hippocampus; can be 
+# changed) and store it in a new variable 'Y'. The variable needs to be column 
+# vector (hence the 'matrix' command).
+Y <- matrix(dat$Left.Hippocampus, ncol=1)
 
-# Extract the structure of interest from the aseg dataframe
-Y <- aseg$Left.Hippocampus
+# As an auxiliary variable, create a vector of number of observations per each 
+# subject, i.e. count the number of occurances for each fsid.base. 
+ni <- matrix(unname(table(dat$fsid.base)), ncol=1)
+````
 
-# Count the number of occurances for each fsid, delete column `x`, and convert
-# to a matrix
-ni <- count(qdec$fsid.base)
-ni$x <- NULL
-ni <- as.matrix(ni)
-```
+- Creating the design matrix and contrasts
 
 Once you have your ordered data, you need to build your design matrix. As an example, a simple linear model containing a group by time interaction can be obtained with the following design matrix:
 
 ```R
-X <- model.matrix(~time*group, qdec)
+X <- model.matrix(~time*DX, dat)
 ```
-The contrast `[0 0 0 1]` can be used to test the interaction between `group` and `time`, which indicates diverging slopes of thickness changes across time for the two groups:
+
+Let us assume that the categorical variable 'DX' has two levels, patients and controls. Then the model matrix 'X' will have four columns: one for the intercept, a time variable, a binary group indicator created from 'DX', and an interaction term between 'DX' and 'time'. The contrast `[0 0 0 1]`, which is a row vector with four elements, can then be used to test the interaction between `DX` and `time`, which indicates diverging slopes of thickness changes across time for the two groups. Instead of a contrast vector, it also possible to specify contrast matrices that have more than one row. Note that the number of columns of the contrast vector or matrix always needs to correspond to the number of columns in the model matrix.
 
 ```R
-C <- matrix(c(0, 0, 0, 1), 1)
+C <- matrix(c(0, 0, 0, 1), nrow=1)
 ```
 
-Estimate the model by using this function:
+- Estimating the model and conducting statistical inference
+
+Estimate the model by using the `lme_fit_FS` function: The arguments `X`, `Y`, and `ni` have been defined before, and `Zcols` is a vector that indicates which terms of the model / columns of the design matrix should be regarded as random effects: assuming that the Intercept is the first column and time is the second column in `X`, use `Zcols=1` for a random-intercept model, and `Zcols=c(1, 2)` for a random-intercept-and-slope model.
 
 ```R
-stats <- lme_fit_FS(X, Zcols, y, ni)
+stats <- lme_fit_FS(X, Zcols, Y, ni)
 ```
 
-Conduct an F-test:
+The function returns a list representing a model fit, with entries Bhat, CovBhat and bihat, among others; Bhat contains the beta values, CovBhat is the error covariance matrix, and bihat the random-effects coefficients.
+
+Finally, conduct an F-test using the `lme_F` function, which takes the model fit and the contrast vector / matrix as inputs:
 
 ```R
 F_C <- lme_F(stats, C)
 ```
 
-The p-value of the test is in `F_C$pval`.
-
+This will return a list with entries F, pval, sgn, and df: F is the F-value, pval is the p-value, sgn is the sign of the beta coefficient, and df are the degrees of freedom.
 
 ### Mass-univariate analyses
 
+The mass-univariate analysis is run per hemisphere (lh and rh). Here and in the following, we only describe the analysis for the left hemisphere, which needs to done also for the right hemisphere.
 
-<!-- # read data -->
+Start with FreeSurfer's `mris_preproc` comamand, which uses the longitudinal 
+qdec table to automatically find the longitudinally processed data and assembles 
+it into a single lh.thickness.mgh file. Note that it is possible to use a 
+different study template than the standard fsaverage template, and that other 
+measures than thickness can be used as well (see the help for mris_preproc).
 
-<!-- Yin<-lme_openmgh("~/Work/lme/A_data/orig/mass_univariate/lh.50sMCI_vs_50cMCI_long_thickness_sm10.mgh") -->
-<!-- Xin<-read.csv("~/Work/lme/A_data/eval/sMCI50_vs_cMCI50.csv") -->
-<!-- nin<-read.csv("~/Work/lme/A_data/eval/sMCI50_vs_cMCI50_idx.csv") -->
-<!-- lh.sphere<-lme_readsurf("~/Work/freesurfer/subjects/fsaverage/surf/lh.sphere") -->
-<!-- lh.cortex<-lme_readlabel("~/Work/freesurfer/subjects/fsaverage/label/lh.cortex.label")[,1] -->
+```
+mris_preproc --qdec-long PATH_TO_QDEC_TABLE/qdec.table.dat --target fsaverage --hemi lh --meas thickness --out lh.thickness.mgh
+```
 
-<!-- # prepare data -->
+The next step is to smooth the data; here we use a 10 mm FWHM kernel.
 
-<!-- Y<-t(as.matrix(drop(Yin$x))) -->
-<!-- X<-as.matrix(Xin) -->
-<!-- Zcols<-c(1,2) -->
-<!-- ni<-as.matrix(nin) -->
-<!-- maskvtx<-sort(lh.cortex+1) -->
-<!-- prs<-12 -->
+```
+mri_surf2surf --hemi lh --s fsaverage --sval lh.thickness.mgh --tval lh.thickness_sm10.mgh --fwhm-trg 10 --cortex --noreshape
+```
 
-<!-- maskvtx2<-maskvtx -->
-<!-- maskvtx2<-maskvtx2[-which(colSums(Y[,maskvtx2])==0)] -->
+- Loading the data
 
-<!-- # algorithm with region-growing -->
+The resulting file as well as will as a set of associated files will be read in to R
 
-<!-- timeFitInit<-system.time(outFitInit<-lme_mass_fit_init(X,Zcols,Y,ni,maskvtx=maskvtx2,numcore=prs)) -->
-<!-- #outFitEMInit<-lme_mass_fit_EMinit(X,Zcols,Y,ni,maskvtx=maskvtx,numcore=prs) -->
+```R
 
-<!-- timeRgGrow<-system.time(outRgGrow<-lme_mass_RgGrow(lh.sphere,outFitInit$Re0,outFitInit$Theta0,maskvtx=maskvtx2,nst=2,prc=95)) -->
+# read thickness file
+lh.thickness<-lme_openmgh("/PATH/TO/lh.thickness_sm10.mgh")
 
-<!-- timeFitRgw<-system.time(outFitRgw<-lme_mass_fit_Rgw(X,Zcols,Y,ni,outFitInit$Theta0,outRgGrow$Regions,lh.sphere,prs=prs)) -->
+# read template surface
+lh.sphere<-lme_readsurf("/PATH/TO/FREESURFER/DIRECTORY/subjects/fsaverage/surf/lh.sphere")
 
-<!-- save(file="~/Work/lme/D_analyses/D2_mass-univariate-rgw/run22/lme_mass_rgw_result_run21.RData",list=c("maskvtx","maskvtx2","timeFitInit","timeFitRgw","timeRgGrow","outFitInit","outRgGrow","outFitRgw","ni","prs","X","Xin","Zcols")) -->
+# read cortical label file
+lh.cortex<-lme_readlabel("/PATH/TO/FREESURFER/DIRECTORY/subjects/fsaverage/label/lh.cortex.label")[,1]
+```
+
+- Preparing the data
+
+The design matrix is prepared in a similar way as for the univariate analysis. We just repeat the code here with minimal comments, see above for an explanation.
+
+```R
+
+# read qdec table
+dat <- read.csv("PATH_TO_QDEC_TABLE/qdec.table.dat")
+
+# order qdec table based on fsid.base and time
+dat <- dat[order(dat$fsid.base, dat$time), ]
+
+# create vector of number of observations per subject
+ni <- matrix(unname(table(dat$fsid.base)), ncol=1)
+
+# create matrix from thickness data
+Y <- t(drop(lh.thickness$x))
+
+# create vector of cortical labels
+maskvtx <- sort(lh.cortex)+1
+```
+
+- Creating the design matrix and contrasts
+
+```R
+# create model matrix
+X <- model.matrix(~time*DX, dat)
+
+# create contrasts
+C1 <- matrix(c(0, 1, 0, 0), nrow=1)
+C2 <- matrix(c(0, 0, 0, 1), nrow=1)
+```
+
+- Estimating the model and conducting statistical inference
+
+```R
+# obtain initial estimates
+outFitInit <- lme_mass_fit_init(X=X, Zcols=1, Y=Y, ni=ni, maskvtx=maskvtx, numcore=12)
+
+# run algorithm to identify spatially homogeneous regions
+outRgGrow <- lme_mass_RgGrow(lh.sphere, outFitInit$Re0, outFitInit$Theta0, maskvtx=maskvtx, nst=2, prc=95)
+
+# fit model
+outFitRgw <- lme_mass_fit_Rgw(X, Zcols, Y, ni, outFitInit$Theta0, outRgGrow$Regions, lh.sphere, prs=12)
+
+# inference
+F_C1 <- lme_mass_F(outFitRgw$stats, C1)
+
+# save
+vol <- NULL
+vol$ndim1 <- length(F_C1$F)
+vol$ndim2 <- 1
+vol$ndim3 <- 1
+vol$nframes <- 1
+vol$x <- F_C1$F
+lme_savemgh(vol=vol, fname=OUTPUT_FILE_NAME)
+```
+
+
+
+
+
+
+
 

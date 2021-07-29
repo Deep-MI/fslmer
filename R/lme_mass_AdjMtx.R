@@ -24,7 +24,7 @@ lme_mass_AdjMtx<-function(Surf,maskvtx=NA)
     surftri<-Surf$faces
     cn<-max(table(matrix(surftri,1)))
     
-    if (!is.na(maskvtx))
+    if (!any(is.na(maskvtx)))
     {
         
         logictri<-surftri

@@ -31,8 +31,6 @@ lme_mass_fit_Rgw<-function(X,Zcols,Y,ni,Th0,Rgs,Surf,fname=NA,Dtype="euc",sptm="
 
     if (prs==1) print("No parallel computing enabled (not recommended)",quote=F)
 
-    #
-
     # --------------------------------------------------------------------------
     # Auxiliary functions
 
@@ -61,7 +59,6 @@ lme_mass_fit_Rgw<-function(X,Zcols,Y,ni,Th0,Rgs,Surf,fname=NA,Dtype="euc",sptm="
 
         return(tf)
     }
-
 
     # balanceRgind
 
@@ -164,14 +161,6 @@ lme_mass_fit_Rgw<-function(X,Zcols,Y,ni,Th0,Rgs,Surf,fname=NA,Dtype="euc",sptm="
 
     n<-sum(ni)
     nv0<-ncol(Y)
-
-    # to make slightly different two vertices with same coord in FreeSurfer meshes
-    print("Note that coordinate adjustment in case of identical vertex locations is not yet supported.",quote=F) # check this
-    # [~,loc] = unique(Surf.coord','rows');
-    # pos = find(~ismember(1:nv0,loc));
-    # if ~isempty(pos)
-    #   Surf.coord(3,pos) = Surf.coord(3,pos) + 0.001;
-    #end;
 
     maskvtx<-which(Rgs!=0)
     nv<-length(maskvtx)

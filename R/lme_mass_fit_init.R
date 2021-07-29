@@ -13,7 +13,7 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{fitInit <- lme_mass_fit_init(X, Zcols, y, ni)}
+#' \dontrun{fitInit <- lme_mass_fit_init(X, Zcols, y=y, ni)}
 
 lme_mass_fit_init<-function(X,Zcols,Y,ni,maskvtx=NA,numcore=1) {
 

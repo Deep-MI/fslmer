@@ -18,7 +18,7 @@ This function returns a list with entries F, pval, sgn, and df.
 Estimate F statistics
 }
 \examples{
-\dontrun{stats <- lme_fit_FS(X, [1, 2], y, ni)}
+\dontrun{stats <- lme_fit_FS(X, Zcols, y, ni)}
 \dontrun{C <- c(0, 1, 0, 0)}
 \dontrun{F <- lme_F(stats, C)}
 }

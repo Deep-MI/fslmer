@@ -26,5 +26,5 @@ ni, and lreml.
 Fit a univariate linear mixed-effects model using Fisher scoring
 }
 \examples{
-\dontrun{stats <- lme_fit_FS(X, [1, 2], y, ni)}
+\dontrun{stats <- lme_fit_FS(X, Zcols, y, ni)}
 }

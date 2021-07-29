@@ -2,16 +2,29 @@
 % Please edit documentation in R/lme_mass_fit_init.R
 \name{lme_mass_fit_init}
 \alias{lme_mass_fit_init}
-\title{Title}
+\title{Initialize model fit}
 \usage{
 lme_mass_fit_init(X, Zcols, Y, ni, maskvtx = NA, numcore = 1)
 }
 \arguments{
-\item{numcore}{}
+\item{X}{Design matrix}
+
+\item{Zcols}{Vector of random effect indices in design matrix}
+
+\item{Y}{Outcome variable}
+
+\item{ni}{Vector indicating the repeated observations of each subject}
+
+\item{maskvtx}{Indices (one-based) for vertices to include in the analysis (default: all)}
+
+\item{numcore}{Number of cores for parallel computing (default: 1)}
 }
 \value{
-
+The function returns an initial model fit, i.e. a list with entries Bhat, Theta, and Re.
 }
 \description{
-Title
+Initialize model fit
+}
+\examples{
+fitInit <- lme_mass_fit_init(X=X, Zcols=[1, 2], y=y, ni=ni)
 }

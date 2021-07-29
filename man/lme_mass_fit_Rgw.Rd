@@ -20,11 +20,38 @@ lme_mass_fit_Rgw(
 )
 }
 \arguments{
-\item{e}{}
+\item{X}{Design matrix}
+
+\item{Zcols}{Vector of random effect indices in design matrix}
+
+\item{ni}{Vector indicating the repeated observations of each subject}
+
+\item{Th0}{Output from \code{lme_mass_fit_init}}
+
+\item{Rgs}{Output from \code{lme_mass_RgGrow}}
+
+\item{Surf}{Spherical surface}
+
+\item{fname}{(currently ignored)}
+
+\item{Dtype}{Distance (default: euclidean)}
+
+\item{sptm}{Spatial measure (default: exp)}
+
+\item{prs}{Number of cores for parallel computing (default: 1)}
+
+\item{e}{Tolerance (default: 10^-1)}
+
+\item{y}{Outcome variable}
 }
 \value{
-
+This function returns a list of lists, with entries st (=status) and stats,
+with the following entries: Bhat, CovBhat, phisqhat, Dhat, Zcols, invEI,
+Pth, Qthth, lreml
 }
 \description{
 Title
+}
+\examples{
+fitRgw <- lme_mass_fit_Rgw(X, Zcols, Y, ni, Th0, Rgs, Surf)
 }

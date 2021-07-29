@@ -1,19 +1,23 @@
-#' Title
+#' Initialize model fit
 #'
-#' @param X
-#' @param Zcols
-#' @param Y
-#' @param ni
-#' @param maskvtx
-#' @param numcore
+#' @param X Design matrix
+#' @param Zcols Vector of random effect indices in design matrix
+#' @param Y Outcome variable
+#' @param ni Vector indicating the repeated observations of each subject
+#' @param maskvtx Indices (one-based) for vertices to include in the analysis (default: all)
+#' @param numcore Number of cores for parallel computing (default: 1)
 #'
 #' @return
+#' The function returns an initial model fit, i.e. a list with entries Bhat, Theta, and Re.
+#' 
 #' @export
 #'
 #' @examples
+#' fitInit <- lme_mass_fit_init(X=X, Zcols=[1, 2], y=y, ni=ni)
 
-lme_mass_fit_init<-function(X,Zcols,Y,ni,maskvtx=NA,numcore=1)
-{
+lme_mass_fit_init<-function(X,Zcols,Y,ni,maskvtx=NA,numcore=1) {
+    
+    #
 
     if (numcore==1) print("No parallel computing enabled (not recommended)",quote=F)
 

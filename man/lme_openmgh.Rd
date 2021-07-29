@@ -2,16 +2,20 @@
 % Please edit documentation in R/lme_openmgh.R
 \name{lme_openmgh}
 \alias{lme_openmgh}
-\title{Title}
+\title{Read FreeSurfer image (mgh) files}
 \usage{
-lme_openmgh(input.file)
+lme_openmgh(fname)
 }
 \arguments{
-\item{input.file}{}
+\item{fname}{Filename of a FreeSurfer mgh file.}
 }
 \value{
-
+The function returns a list with entries
+x, v, ndim1, ndim2, ndim3, nframes, type, and dof.
 }
 \description{
-Title
+Read FreeSurfer image (mgh) files
+}
+\examples{
+mgh <- lme_openmgh(filename)
 }

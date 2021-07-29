@@ -1,15 +1,20 @@
-#' Title
+#' Estimate F statistics
 #'
-#' @param stats
-#' @param C
+#' @param stats Output from the \code{lme_fit_FS} function
+#' @param C Contrast vector
 #'
 #' @return
+#' This function returns a list with entries F, pval, sgn, and df.
+#' 
 #' @export
 #'
 #' @examples
+#' stats <- lme_fit_FS(X, [1, 2], y, ni)
+#' C <- c(0, 1, 0, 0)
+#' F <- lme_F(stats, C)
 
-lme_F<-function(stats,C)
-{
+lme_F<-function(stats, C) {
+  
 	# --------------------------------------------------------------------------
 
 	X = stats$X
@@ -122,7 +127,7 @@ lme_F<-function(stats,C)
     sgn = sign(C %*% Bhat)
     df = c(szC,m)
 
-	F_C<- list("F" = F,"pval" = pval,"sgn" = sgn,"df" = df)
+	  F_C<- list("F" = F,"pval" = pval,"sgn" = sgn,"df" = df)
     return(F_C)
 
 }

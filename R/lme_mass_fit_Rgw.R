@@ -1,22 +1,27 @@
 #' Title
 #'
-#' @param X
-#' @param Zcols
-#' @param Y
-#' @param ni
-#' @param Th0
-#' @param Rgs
-#' @param Surf
-#' @param fname
-#' @param Dtype
-#' @param sptm
-#' @param prs
-#' @param e
+#' @param X Design matrix
+#' @param Zcols Vector of random effect indices in design matrix
+#' @param y Outcome variable
+#' @param ni Vector indicating the repeated observations of each subject
+#' @param Th0 Output from \code{lme_mass_fit_init}
+#' @param Rgs Output from \code{lme_mass_RgGrow}
+#' @param Surf Spherical surface
+#' @param fname (currently ignored)
+#' @param Dtype Distance (default: euclidean)
+#' @param sptm Spatial measure (default: exp)
+#' @param prs Number of cores for parallel computing (default: 1)
+#' @param e Tolerance (default: 10^-1)
 #'
 #' @return
+#' This function returns a list of lists, with entries st (=status) and stats, 
+#' with the following entries: Bhat, CovBhat, phisqhat, Dhat, Zcols, invEI, 
+#' Pth, Qthth, lreml
+#' 
 #' @export
 #'
 #' @examples
+#' fitRgw <- lme_mass_fit_Rgw(X, Zcols, Y, ni, Th0, Rgs, Surf)
 
 lme_mass_fit_Rgw<-function(X,Zcols,Y,ni,Th0,Rgs,Surf,fname=NA,Dtype="euc",sptm="exp",prs=1,e=0.1)
 {

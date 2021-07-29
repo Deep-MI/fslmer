@@ -2,16 +2,21 @@
 % Please edit documentation in R/lme_readlabel.R
 \name{lme_readlabel}
 \alias{lme_readlabel}
-\title{Title}
+\title{Read FreeSurfer label files}
 \usage{
 lme_readlabel(fname)
 }
 \arguments{
-\item{fname}{}
+\item{fname}{Filename of a FreeSurfer label file.}
 }
 \value{
-
+The function returns a nvertices-by-5 matrix, where each column means:
+(1) vertex number, (2-4) xyz at each vertex, (5) label value. The
+vertex number is 0-based.
 }
 \description{
-Title
+Read FreeSurfer label files
+}
+\examples{
+labels <- lme_readlabel(filename)
 }

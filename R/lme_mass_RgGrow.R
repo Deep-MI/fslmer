@@ -1,16 +1,19 @@
-#' Title
+#' Region-growing algorithm to identify spatially homogeneous regions
 #'
-#' @param SphSurf
-#' @param Re
-#' @param Theta
-#' @param maskvtx
-#' @param nst
-#' @param prc
+#' @param SphSurf Spherical surface
+#' @param Re Output from \code{lme_mass_fit_init}
+#' @param Theta Output from \code{lme_mass_fit_init}
+#' @param maskvtx Indices (one-based) for vertices to include in the analysis (default: all)
+#' @param nst Internal parameter (default: 2)
+#' @param prc Internal parameter (default: 95)
 #'
 #' @return
+#' A list with spatially homogeneous regions and their means.
+#' 
 #' @export
 #'
 #' @examples
+#' RgGrow <- lme_mass_RgGrow(SphSurf, Re, Theta, maskvtx=NA, nst=2, prc=95)
 
 lme_mass_RgGrow<-function(SphSurf,Re,Theta,maskvtx=NA,nst=2,prc=95)
 {

@@ -2,16 +2,19 @@
 % Please edit documentation in R/lme_readsurf.R
 \name{lme_readsurf}
 \alias{lme_readsurf}
-\title{Title}
+\title{Read FreeSurfer surface files}
 \usage{
 lme_readsurf(fname)
 }
 \arguments{
-\item{fname}{}
+\item{fname}{Filename of a FreeSurfer surface file.}
 }
 \value{
-
+The function returns a list with entries vertices and faces.
 }
 \description{
-Title
+Read FreeSurfer surface files
+}
+\examples{
+surf <- lme_readsurf(filename)
 }

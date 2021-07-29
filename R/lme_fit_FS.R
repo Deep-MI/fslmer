@@ -1,18 +1,23 @@
-#' Title
+#' Fit a univariate linear mixed-effects model using Fisher scoring
 #'
-#' @param X
-#' @param Zcols
-#' @param y
-#' @param ni
-#' @param e
+#' @param X Design matrix
+#' @param Zcols Vector of random effect indices in design matrix
+#' @param y Outcome variable
+#' @param ni Vector indicating the repeated observations of each subject
+#' @param e Tolerance (default: 10^-3)
 #'
-#' @return
+#' @return 
+#' The function returns list of statistics, with the following entries: 
+#' Bhat, CovBhat, bihat, Covbihat, phisqhat, SIGMA, W, Dhat, X, Zcols, re, 
+#' ni, and lreml.
+#' 
 #' @export
 #'
 #' @examples
+#' stats <- lme_fit_FS(X, [1, 2], y, ni)
 
-lme_fit_FS<-function(X,Zcols,y,ni,e=10^-3)
-    {
+lme_fit_FS<-function(X, Zcols, y, ni, e=10^-3) {
+    
     # --------------------------------------------------------------------------
     # Input checks
 

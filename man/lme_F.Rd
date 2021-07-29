@@ -2,16 +2,23 @@
 % Please edit documentation in R/lme_F.R
 \name{lme_F}
 \alias{lme_F}
-\title{Title}
+\title{Estimate F statistics}
 \usage{
 lme_F(stats, C)
 }
 \arguments{
-\item{C}{}
+\item{stats}{Output from the \code{lme_fit_FS} function}
+
+\item{C}{Contrast vector}
 }
 \value{
-
+This function returns a list with entries F, pval, sgn, and df.
 }
 \description{
-Title
+Estimate F statistics
+}
+\examples{
+stats <- lme_fit_FS(X, [1, 2], y, ni)
+C <- c(0, 1, 0, 0)
+F <- lme_F(stats, C)
 }

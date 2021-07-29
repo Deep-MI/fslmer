@@ -2,16 +2,29 @@
 % Please edit documentation in R/lme_mass_RgGrow.R
 \name{lme_mass_RgGrow}
 \alias{lme_mass_RgGrow}
-\title{Title}
+\title{Region-growing algorithm to identify spatially homogeneous regions}
 \usage{
 lme_mass_RgGrow(SphSurf, Re, Theta, maskvtx = NA, nst = 2, prc = 95)
 }
 \arguments{
-\item{prc}{}
+\item{SphSurf}{Spherical surface}
+
+\item{Re}{Output from \code{lme_mass_fit_init}}
+
+\item{Theta}{Output from \code{lme_mass_fit_init}}
+
+\item{maskvtx}{Indices (one-based) for vertices to include in the analysis (default: all)}
+
+\item{nst}{Internal parameter (default: 2)}
+
+\item{prc}{Internal parameter (default: 95)}
 }
 \value{
-
+A list with spatially homogeneous regions and their means.
 }
 \description{
-Title
+Region-growing algorithm to identify spatially homogeneous regions
+}
+\examples{
+RgGrow <- lme_mass_RgGrow(SphSurf, Re, Theta, maskvtx=NA, nst=2, prc=95)
 }

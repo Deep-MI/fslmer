@@ -1,4 +1,4 @@
-lme_R<-function(lrmlfull,lrmlred,q)
+lme_LR<-function(lrmlfull,lrmlred,q)
 {
     # --------------------------------------------------------------------------
     # preparations

@@ -33,7 +33,7 @@ If you use these tools in your analysis please cite:
 You can install fslmer from [GitHub](https://github.com/) with:
 
 ```{r, eval=FALSE}
-# install.packages("devtools")
+# install.packages("devtools") # run if necessary
 devtools::install_github("Deep-MI/fslmer")
 ```
 ## Running the program
@@ -98,7 +98,7 @@ Once you have your ordered data, you need to build your design matrix. As an exa
 X <- model.matrix(~time*DX, dat)
 ```
 
-Let us assume that the categorical variable "DX" has two levels, patients and controls. Then the model matrix `X` will have four columns: one for the intercept, a time variable, a binary group indicator created from 'DX', and an interaction term between 'DX' and 'time'. The contrast `[0 0 0 1]`, which is a row vector with four elements, can then be used to test the interaction between "DX" and "time", which indicates diverging slopes of thickness changes across time for the two groups. Instead of a contrast vector, it also possible to specify contrast matrices that have more than one row. Note that the number of columns of the contrast vector or matrix always needs to correspond to the number of columns in the model matrix.
+Let us assume that the categorical variable `DX` has two levels, patients and controls. Then the model matrix `X` will have four columns: one for the intercept, a time variable, a binary group indicator created from 'DX', and an interaction term between 'DX' and 'time'. The contrast `[0 0 0 1]`, which is a row vector with four elements, can then be used to test the interaction between `DX` and `time`, which indicates diverging slopes of thickness changes across time for the two groups. Instead of a contrast vector, it also possible to specify contrast matrices that have more than one row. Note that the number of columns of the contrast vector or matrix always needs to correspond to the number of columns in the model matrix.
 
 ```{r, eval=FALSE}
 C <- matrix(c(0, 0, 0, 1), nrow=1)
@@ -112,7 +112,7 @@ Estimate the model by using the `lme_fit_FS` function: The arguments `X`, `Y`, a
 stats <- lme_fit_FS(X, Zcols, Y, ni)
 ```
 
-The function returns a list representing a model fit, with entries "Bhat", "CovBhat", and "bihat", among others; "Bhat" contains the beta values, "CovBhat" is the error covariance matrix, and "bihat" contains the random-effects coefficients.
+The function returns a list representing a model fit, with entries `Bhat`, `CovBhat`, and `bihat`, among others; `Bhat` contains the beta values, `CovBhat` is the error covariance matrix, and `bihat` contains the random-effects coefficients.
 
 Finally, conduct an F-test using the `lme_F` function, which takes the model fit and the contrast vector / matrix as inputs:
 
@@ -120,7 +120,7 @@ Finally, conduct an F-test using the `lme_F` function, which takes the model fit
 F_C <- lme_F(stats, C)
 ```
 
-This will return a list with entries "F", "pval", "sgn", and "df": "F" is the F-value, "pval" is the p-value, "sgn" is the sign of the beta coefficient, and "df" are the degrees of freedom.
+This will return a list with entries `F`, `pval`, `sgn`, and `df`: `F` is the F-value, `pval` is the p-value, `sgn` is the sign of the beta coefficient, and `df` are the degrees of freedom.
 
 ### Mass-univariate analyses
 
@@ -140,7 +140,7 @@ mri_surf2surf --hemi lh --s fsaverage --sval lh.thickness.mgh --tval lh.thicknes
 
 - Loading the data
 
-The `lh.thickness_sm10.mgh`. file as well as a set of associated files will next be read into R.
+The `lh.thickness_sm10.mgh` file as well as a set of associated files will next be read into R.
 
 ```{r, eval=FALSE}
 # load the package
@@ -228,11 +228,11 @@ Inference consists of two parts, the calculation of F-values and uncorrected p-v
 F_C <- lme_mass_F(FitRgw$stats, C)
 ```
 
-Multiple comparison correction can be done via classical FDR thresholding or via a two-stage FDR procedure, an extension of the classical FDR procedure with higher power to detect significant effects. For classical FDR thresholding, we submit the output of the `lme_mass_F` function to the `lme_mass_fdr` function. This gives an updated threshold for uncorrected p-values that keeps the FDR. For the two-stage procedure, we submit the output of the `lme_mass_F` function to the `lme_mass_FDR2` function. This gives a list (`FDR2_C`) of corrected p-values (`FDR2_C$sided_pval`), indices of vertices surviving the correction (`FDR2_C$detvtx`), and the new thereshold (`FDR2_C$pth`), among others. Also this analysis needs to be run multiple times if you have multiple contrasts.
+Multiple comparison correction can be done via classical FDR thresholding or via a two-stage FDR procedure, an extension of the classical FDR procedure with higher power to detect significant effects. For classical FDR thresholding, we submit the output of the `lme_mass_F` function to the `lme_mass_FDR` function. This gives an updated threshold for uncorrected p-values that keeps the FDR. For the two-stage procedure, we submit the output of the `lme_mass_F` function to the `lme_mass_FDR2` function. This gives a list (`FDR2_C`) of corrected p-values (`FDR2_C$sided_pval`), indices of vertices surviving the correction (`FDR2_C$detvtx`), and the new thereshold (`FDR2_C$pth`), among others. Also this analysis needs to be run multiple times if you have multiple contrasts.
 
 ```{r, eval=FALSE}
 # multiple comparison correction using classical FDR
-thr_pFDR  <- lme_mass_fdr(F_C$pval, 0.05)
+thr_pFDR  <- lme_mass_FDR(F_C$pval, 0.05)
 
 # multiple comparison correction using two-stage approach
 FDR2_C <- lme_mass_FDR2(F_C$pval, F_C$sgn)
@@ -240,7 +240,7 @@ FDR2_C <- lme_mass_FDR2(F_C$pval, F_C$sgn)
 
 - Export the results for visualization with Freeview
 
-The last step in this analysis is to export the results for visualzation with FreeSurfer's Freeview program. Three kinds of parameters are typically of interest: the statistical parameters (here: F-values) and the corrected or uncorrected p-values. We use the `lme_savemgh` function for exporting the data, which can the be overlaid onto the corresponding (lh or rh) surface of the template brain that was used for the analysis (here: `fsaverage`).
+The last step in this analysis is to export the results for visualization with FreeSurfer's Freeview program. Three kinds of parameters are typically of interest: the statistical parameters (here: F-values) and the corrected or uncorrected p-values. We use the `lme_savemgh` function for exporting the data, which can then be overlaid onto the corresponding (lh or rh) surface of the template brain that was used for the analysis (here: `fsaverage`).
 
 Exporting the data requires two things: first, creating an object (here: `vol`) that contains the data and some information about the image dimensions. Since we are constructing surface overlay files, the dimensions will be `(nVertices, 1, 1, 1)`. Second, the overlay data need to be extracted from the outputs of the various functions; how this is done for each type of parameters is illustrated below.
 

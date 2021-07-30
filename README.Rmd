@@ -37,7 +37,7 @@ If you use these tools in your analysis please cite:
 You can install fslmer from [GitHub](https://github.com/) with:
 
 ```R
-# install.packages("devtools")
+# install.packages("devtools") # run if necessary
 devtools::install_github("Deep-MI/fslmer")
 ```
 ## Running the program
@@ -66,7 +66,7 @@ library(fslmer)
 
 # Load aseg/aparc and qdec tables into R:
 aseg <- read.table("PATH_TO_DATA/aseg.long.table", header=True)
-qdec <- read.table("PATH_TO_QDEC_TABLE/qdec.table.dat", header=True )
+qdec <- read.table("PATH_TO_QDEC_TABLE/qdec.table.dat", header=True)
 
 # Read the qdec and aseg tables; note that R replaces '-' (and other characters) 
 # in variable names with '.'.
@@ -102,7 +102,7 @@ Once you have your ordered data, you need to build your design matrix. As an exa
 X <- model.matrix(~time*DX, dat)
 ```
 
-Let us assume that the categorical variable "DX" has two levels, patients and controls. Then the model matrix `X` will have four columns: one for the intercept, a time variable, a binary group indicator created from 'DX', and an interaction term between 'DX' and 'time'. The contrast `[0 0 0 1]`, which is a row vector with four elements, can then be used to test the interaction between "DX" and "time", which indicates diverging slopes of thickness changes across time for the two groups. Instead of a contrast vector, it also possible to specify contrast matrices that have more than one row. Note that the number of columns of the contrast vector or matrix always needs to correspond to the number of columns in the model matrix.
+Let us assume that the categorical variable `DX` has two levels, patients and controls. Then the model matrix `X` will have four columns: one for the intercept, a time variable, a binary group indicator created from 'DX', and an interaction term between 'DX' and 'time'. The contrast `[0 0 0 1]`, which is a row vector with four elements, can then be used to test the interaction between `DX` and `time`, which indicates diverging slopes of thickness changes across time for the two groups. Instead of a contrast vector, it also possible to specify contrast matrices that have more than one row. Note that the number of columns of the contrast vector or matrix always needs to correspond to the number of columns in the model matrix.
 
 ```R
 C <- matrix(c(0, 0, 0, 1), nrow=1)
@@ -116,7 +116,7 @@ Estimate the model by using the `lme_fit_FS` function: The arguments `X`, `Y`, a
 stats <- lme_fit_FS(X, Zcols, Y, ni)
 ```
 
-The function returns a list representing a model fit, with entries "Bhat", "CovBhat", and "bihat", among others; "Bhat" contains the beta values, "CovBhat" is the error covariance matrix, and "bihat" contains the random-effects coefficients.
+The function returns a list representing a model fit, with entries `Bhat`, `CovBhat`, and `bihat`, among others; `Bhat` contains the beta values, `CovBhat` is the error covariance matrix, and `bihat` contains the random-effects coefficients.
 
 Finally, conduct an F-test using the `lme_F` function, which takes the model fit and the contrast vector / matrix as inputs:
 
@@ -124,7 +124,7 @@ Finally, conduct an F-test using the `lme_F` function, which takes the model fit
 F_C <- lme_F(stats, C)
 ```
 
-This will return a list with entries "F", "pval", "sgn", and "df": "F" is the F-value, "pval" is the p-value, "sgn" is the sign of the beta coefficient, and "df" are the degrees of freedom.
+This will return a list with entries `F`, `pval`, `sgn`, and `df`: `F` is the F-value, `pval` is the p-value, `sgn` is the sign of the beta coefficient, and `df` are the degrees of freedom.
 
 ### Mass-univariate analyses
 
@@ -144,7 +144,7 @@ mri_surf2surf --hemi lh --s fsaverage --sval lh.thickness.mgh --tval lh.thicknes
 
 - Loading the data
 
-The `lh.thickness_sm10.mgh`. file as well as a set of associated files will next be read into R.
+The `lh.thickness_sm10.mgh` file as well as a set of associated files will next be read into R.
 
 ```R
 # load the package
@@ -244,7 +244,7 @@ FDR2_C <- lme_mass_FDR2(F_C$pval, F_C$sgn)
 
 - Export the results for visualization with Freeview
 
-The last step in this analysis is to export the results for visualzation with FreeSurfer's Freeview program. Three kinds of parameters are typically of interest: the statistical parameters (here: F-values) and the corrected or uncorrected p-values. We use the `lme_savemgh` function for exporting the data, which can the be overlaid onto the corresponding (lh or rh) surface of the template brain that was used for the analysis (here: `fsaverage`).
+The last step in this analysis is to export the results for visualization with FreeSurfer's Freeview program. Three kinds of parameters are typically of interest: the statistical parameters (here: F-values) and the corrected or uncorrected p-values. We use the `lme_savemgh` function for exporting the data, which can then be overlaid onto the corresponding (lh or rh) surface of the template brain that was used for the analysis (here: `fsaverage`).
 
 Exporting the data requires two things: first, creating an object (here: `vol`) that contains the data and some information about the image dimensions. Since we are constructing surface overlay files, the dimensions will be `(nVertices, 1, 1, 1)`. Second, the overlay data need to be extracted from the outputs of the various functions; how this is done for each type of parameters is illustrated below.
 

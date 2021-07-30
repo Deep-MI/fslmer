@@ -1,4 +1,4 @@
-#' Title
+#' 	Mass-univariate linear mixed-effects model fitting using spatially homogeneous regions
 #'
 #' @param X Design matrix
 #' @param Zcols Vector of random effect indices in design matrix

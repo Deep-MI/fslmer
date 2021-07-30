@@ -1,22 +1,18 @@
 ---
-output: github_document
+title: "Example analyses"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Example analyses}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
-
-<!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
+  comment = "#>"
 )
 ```
-
-# fslmer
-
-<!-- badges: start -->
-<!-- badges: end -->
 
 ## Overview
 
@@ -36,10 +32,11 @@ If you use these tools in your analysis please cite:
 
 You can install fslmer from [GitHub](https://github.com/) with:
 
-```R
-# install.packages("devtools")
+```{R, eval=FALSE}
+# install.packages("devtools") # use if needed
 devtools::install_github("Deep-MI/fslmer")
 ```
+
 ## Running the program
 
 There are two types of analyses that can be done: univariate and mass-univariate. The univariate analysis is, in principle, similar to classical mixed-effects analyses as implemented in the `lme4` or `nlme` packages. The mass-univariate analysis is specifically tailored for the surface-based vertex data from a preceding run of FreeSurfer's longitudinal analysis pipeline.
@@ -60,10 +57,7 @@ Your longitudinal Qdec table needs to contain the "fsid-base" (subject ID) colum
 
 After loading the data, some further preparations are needed, including merging and sorting the data. In particular, the fslmer tools require the data ordered according to time for each individual (that is, your design matrix needs to have all the repeated assessments for the first subject, then all for the second and so on). 
 
-```R
-# load the package
-library(fslmer)
-
+```{R, eval=FALSE}
 # Load aseg/aparc and qdec tables into R:
 aseg <- read.table("PATH_TO_DATA/aseg.long.table", header=True)
 qdec <- read.table("PATH_TO_QDEC_TABLE/qdec.table.dat", header=True )
@@ -92,19 +86,19 @@ Y <- matrix(dat$Left.Hippocampus, ncol=1)
 # As an auxiliary variable, create a vector of number of observations per each 
 # subject, i.e. count the number of occurances for each fsid.base. 
 ni <- matrix(unname(table(dat$fsid.base)), ncol=1)
-````
+```
 
 - Creating the design matrix and contrasts
 
 Once you have your ordered data, you need to build your design matrix. As an example, a simple linear model containing a group by time interaction can be obtained with the following design matrix:
 
-```R
+```{R, eval=FALSE}
 X <- model.matrix(~time*DX, dat)
 ```
 
 Let us assume that the categorical variable 'DX' has two levels, patients and controls. Then the model matrix 'X' will have four columns: one for the intercept, a time variable, a binary group indicator created from 'DX', and an interaction term between 'DX' and 'time'. The contrast `[0 0 0 1]`, which is a row vector with four elements, can then be used to test the interaction between `DX` and `time`, which indicates diverging slopes of thickness changes across time for the two groups. Instead of a contrast vector, it also possible to specify contrast matrices that have more than one row. Note that the number of columns of the contrast vector or matrix always needs to correspond to the number of columns in the model matrix.
 
-```R
+```{R, eval=FALSE}
 C <- matrix(c(0, 0, 0, 1), nrow=1)
 ```
 
@@ -112,7 +106,7 @@ C <- matrix(c(0, 0, 0, 1), nrow=1)
 
 Estimate the model by using the `lme_fit_FS` function: The arguments `X`, `Y`, and `ni` have been defined before, and `Zcols` is a vector that indicates which terms of the model / columns of the design matrix should be regarded as random effects: assuming that the Intercept is the first column and time is the second column in `X`, use `Zcols=1` for a random-intercept model, and `Zcols=c(1, 2)` for a random-intercept-and-slope model.
 
-```R
+```{R, eval=FALSE}
 stats <- lme_fit_FS(X, Zcols, Y, ni)
 ```
 
@@ -120,7 +114,7 @@ The function returns a list representing a model fit, with entries Bhat, CovBhat
 
 Finally, conduct an F-test using the `lme_F` function, which takes the model fit and the contrast vector / matrix as inputs:
 
-```R
+```{R, eval=FALSE}
 F_C <- lme_F(stats, C)
 ```
 
@@ -148,9 +142,9 @@ mri_surf2surf --hemi lh --s fsaverage --sval lh.thickness.mgh --tval lh.thicknes
 
 - Loading the data
 
-The resulting file as well as will as a set of associated files will be read in to R.
+The resulting file as well as will as a set of associated files will be read in to R
 
-```R
+```{R, eval=FALSE}
 # load the package
 library(fslmer)
 
@@ -168,8 +162,7 @@ lh.cortex<-lme_readlabel("/PATH/TO/FREESURFER/DIRECTORY/subjects/fsaverage/label
 
 The design matrix is prepared in a similar way as for the univariate analysis. We just repeat the code here with minimal comments, see above for an explanation.
 
-```R
-
+```{R, eval=FALSE}
 # read qdec table
 dat <- read.csv("PATH_TO_QDEC_TABLE/qdec.table.dat")
 
@@ -188,7 +181,7 @@ maskvtx <- sort(lh.cortex)+1
 
 - Creating the design matrix and contrasts
 
-```R
+```{R, eval=FALSE}
 # create model matrix
 X <- model.matrix(~time*DX, dat)
 
@@ -199,7 +192,7 @@ C2 <- matrix(c(0, 0, 0, 1), nrow=1)
 
 - Estimating the model and conducting statistical inference
 
-```R
+```{R, eval=FALSE}
 # obtain initial estimates
 outFitInit <- lme_mass_fit_init(X=X, Zcols=1, Y=Y, ni=ni, maskvtx=maskvtx, numcore=12)
 
@@ -221,11 +214,4 @@ vol$nframes <- 1
 vol$x <- F_C1$F
 lme_savemgh(vol=vol, fname=OUTPUT_FILE_NAME)
 ```
-
-
-
-
-
-
-
-
+  

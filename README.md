@@ -9,13 +9,14 @@
 
 ## Overview
 
-This project is a port of Freesurfer’s Matlab-based LME tools to the R
-programming language.
+The `fslmer` package provides univariate and mass-univariate linear
+mixed-effects analysis for FreeSurfer imaging data. It is a port of
+Freesurfer’s Matlab-based LME tools to the R programming language.
 
 Please refer to the original documentation at
 <https://surfer.nmr.mgh.harvard.edu/fswiki/LongitudinalStatistics> and
 <https://surfer.nmr.mgh.harvard.edu/fswiki/LinearMixedEffectsModels> for
-an overview and futher information about the software. For the original
+an overview and further information about the software. For the original
 code, see the original repository at
 <https://github.com/NeuroStats/lme>.
 
@@ -90,6 +91,9 @@ design matrix needs to have all the repeated assessments for the first
 subject, then all for the second and so on).
 
 ``` r
+# load the package
+library(fslmer)
+
 # Load aseg/aparc and qdec tables into R:
 aseg <- read.table("PATH_TO_DATA/aseg.long.table", header=True)
 qdec <- read.table("PATH_TO_QDEC_TABLE/qdec.table.dat", header=True )
@@ -198,9 +202,11 @@ The next step is to smooth the data; here we use a 10 mm FWHM kernel.
   - Loading the data
 
 The resulting file as well as will as a set of associated files will be
-read in to R
+read in to R.
 
 ``` r
+# load the package
+library(fslmer)
 
 # read thickness file
 lh.thickness<-lme_openmgh("/PATH/TO/lh.thickness_sm10.mgh")

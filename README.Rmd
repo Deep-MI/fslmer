@@ -38,7 +38,7 @@ You can install fslmer from [GitHub](https://github.com/) with:
 
 ```R
 # install.packages("devtools") # run if necessary
-devtools::install_github("Deep-MI/fslmer")
+devtools::install_github("Deep-MI/fslmer", build_vignettes=TRUE)
 ```
 ## Running the program
 

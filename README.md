@@ -50,8 +50,8 @@ devtools::install_github("Deep-MI/fslmer")
 ## Running the program
 
 There are two types of analyses that can be done: univariate and
-mass-univariate. The univariate analysis is, in principle, similar to
-classical mixed-effects analyses as implemented in the `lme4` or `nlme`
+mass-univariate. The univariate analysis is, in principle, similar to a
+classical mixed-effects analysis as implemented in the `lme4` or `nlme`
 packages. The mass-univariate analysis is specifically tailored for the
 surface-based vertex data from a preceding run of FreeSurfer’s
 longitudinal analysis pipeline.
@@ -79,13 +79,13 @@ contain an additional column indicating time from baseline or the
 sequence of observations. Additional columns such as diagnoses,
 demographics, or covariates may also be present. For the current
 example, we assume that the timing info is stored in a numerical
-variable called ‘time’, indicating years from baseline, and that a
-categorical variable ‘DX’ indicates a diagnosis at baseline. You can
+variable called “time”, indicating years from baseline, and that a
+categorical variable “DX” indicates a diagnosis at baseline. You can
 used other names and/or additional variables in your analysis, but the
 example code has to be adapted accordingly.
 
 After loading the data, some further preparations are needed, including
-merging and sorting the data. In particular, the fslmer tools require
+merging and sorting the data. In particular, the `fslmer` tools require
 the data ordered according to time for each individual (that is, your
 design matrix needs to have all the repeated assessments for the first
 subject, then all for the second and so on).
@@ -134,12 +134,12 @@ interaction can be obtained with the following design matrix:
 X <- model.matrix(~time*DX, dat)
 ```
 
-Let us assume that the categorical variable ‘DX’ has two levels,
-patients and controls. Then the model matrix ‘X’ will have four columns:
+Let us assume that the categorical variable “DX” has two levels,
+patients and controls. Then the model matrix `X` will have four columns:
 one for the intercept, a time variable, a binary group indicator created
 from ‘DX’, and an interaction term between ‘DX’ and ‘time’. The contrast
 `[0 0 0 1]`, which is a row vector with four elements, can then be used
-to test the interaction between `DX` and `time`, which indicates
+to test the interaction between “DX” and “time”, which indicates
 diverging slopes of thickness changes across time for the two groups.
 Instead of a contrast vector, it also possible to specify contrast
 matrices that have more than one row. Note that the number of columns of
@@ -164,10 +164,10 @@ random-intercept-and-slope model.
 stats <- lme_fit_FS(X, Zcols, Y, ni)
 ```
 
-The function returns a list representing a model fit, with entries Bhat,
-CovBhat and bihat, among others; Bhat contains the beta values, CovBhat
-is the error covariance matrix, and bihat the random-effects
-coefficients.
+The function returns a list representing a model fit, with entries
+“Bhat”, “CovBhat”, and “bihat”, among others; “Bhat” contains the
+beta values, “CovBhat” is the error covariance matrix, and “bihat”
+contains the random-effects coefficients.
 
 Finally, conduct an F-test using the `lme_F` function, which takes the
 model fit and the contrast vector / matrix as inputs:
@@ -176,19 +176,19 @@ model fit and the contrast vector / matrix as inputs:
 F_C <- lme_F(stats, C)
 ```
 
-This will return a list with entries F, pval, sgn, and df: F is the
-F-value, pval is the p-value, sgn is the sign of the beta coefficient,
-and df are the degrees of freedom.
+This will return a list with entries “F”, “pval”, “sgn”, and “df”: “F”
+is the F-value, “pval” is the p-value, “sgn” is the sign of the beta
+coefficient, and “df” are the degrees of freedom.
 
 ### Mass-univariate analyses
 
-The mass-univariate analysis is run per hemisphere (lh and rh). Here and
-in the following, we only describe the analysis for the left hemisphere,
-which needs to done also for the right hemisphere.
+The mass-univariate analysis is run per hemisphere (“lh” and “rh”). Here
+and in the following, we only describe the analysis for the left
+hemisphere, which needs to done also for the right hemisphere.
 
 Start with FreeSurfer’s `mris_preproc` comamand, which uses the
 longitudinal qdec table to automatically find the longitudinally
-processed data and assembles it into a single lh.thickness.mgh file.
+processed data and assembles it into a single `lh.thickness.mgh` file.
 Note that it is possible to use a different study template than the
 standard fsaverage template, and that other measures than thickness can
 be used as well (see the help for mris\_preproc).
@@ -196,36 +196,36 @@ be used as well (see the help for mris\_preproc).
     mris_preproc --qdec-long PATH_TO_QDEC_TABLE/qdec.table.dat --target fsaverage --hemi lh --meas thickness --out lh.thickness.mgh
 
 The next step is to smooth the data; here we use a 10 mm FWHM kernel.
+The resulting file will be `lh.thickness_sm10.mgh`.
 
     mri_surf2surf --hemi lh --s fsaverage --sval lh.thickness.mgh --tval lh.thickness_sm10.mgh --fwhm-trg 10 --cortex --noreshape
 
   - Loading the data
 
-The resulting file as well as will as a set of associated files will be
-read in to R.
+The `lh.thickness_sm10.mgh`. file as well as a set of associated files
+will next be read into R.
 
 ``` r
 # load the package
 library(fslmer)
 
 # read thickness file
-lh.thickness<-lme_openmgh("/PATH/TO/lh.thickness_sm10.mgh")
+lh.thickness <- lme_openmgh("/PATH/TO/lh.thickness_sm10.mgh")
 
 # read template surface
-lh.sphere<-lme_readsurf("/PATH/TO/FREESURFER/DIRECTORY/subjects/fsaverage/surf/lh.sphere")
+lh.sphere <- lme_readsurf("/PATH/TO/FREESURFER/DIRECTORY/subjects/fsaverage/surf/lh.sphere")
 
 # read cortical label file
-lh.cortex<-lme_readlabel("/PATH/TO/FREESURFER/DIRECTORY/subjects/fsaverage/label/lh.cortex.label")[,1]
+lh.cortex <- lme_readlabel("/PATH/TO/FREESURFER/DIRECTORY/subjects/fsaverage/label/lh.cortex.label")[,1]
 ```
 
   - Preparing the data
 
-The design matrix is prepared in a similar way as for the univariate
-analysis. We just repeat the code here with minimal comments, see above
-for an explanation.
+The data is prepared in a similar way as for the univariate analysis. We
+just repeat the code here with minimal comments, see above for an
+explanation.
 
 ``` r
-
 # read qdec table
 dat <- read.csv("PATH_TO_QDEC_TABLE/qdec.table.dat")
 
@@ -235,49 +235,159 @@ dat <- dat[order(dat$fsid.base, dat$time), ]
 # create vector of number of observations per subject
 ni <- matrix(unname(table(dat$fsid.base)), ncol=1)
 
-# create matrix from thickness data
+# create nSubjects-times-nVertices matrix for thickness data
 Y <- t(drop(lh.thickness$x))
 
-# create vector of cortical labels
+# create (1-based) vector of cortical label indices (to exclude non-cortical vertices)
 maskvtx <- sort(lh.cortex)+1
 ```
 
   - Creating the design matrix and contrasts
 
-<!-- end list -->
+Also the design matrix and the contrasts are constructed in the same way
+as for the univariate analysis. Again, we just repeat the code here.
 
 ``` r
 # create model matrix
 X <- model.matrix(~time*DX, dat)
 
 # create contrasts
-C1 <- matrix(c(0, 1, 0, 0), nrow=1)
-C2 <- matrix(c(0, 0, 0, 1), nrow=1)
+C <- matrix(c(0, 0, 0, 1), nrow=1)
+
+# determine the type of mixed-effects model (assuming the intercept is column 1 
+# in the design matrix and the time variable is column 2).
+#Zcols <- 1 # random-intercept 
+Zcols <- c(1, 2) # random-slope, random-intercept
 ```
 
-  - Estimating the model and conducting statistical inference
+  - Estimate the model
 
-<!-- end list -->
+There two ways to estimate the model in the mass-univariate analysis.
+The first one is a simple vertex-wise analysis, and the second one is a
+novel analysis with a spatiotemporal model for the inherent dependencies
+(covariances) in the data. We recommend this second approach, because
+spatiotemporal models are more powerful to detect effects in your data
+than traditional vertex-wise models when two or more random effects are
+included in the longitudinal statistical model. Fitting these models
+usually requires less computation time than the above vertex-wise
+mass-univariate tools.
+
+The simple vertex-wise analysis can be run using the `lme_mass_fit_vw`
+function, which returns a list (`stats`) of statistical estimates (beta
+weights, their covariances, and others) that can be submitted to
+statistical inference subsequently.
+
+``` r
+stats <- lme_mass_fit_vw(X, Zcols, Y, ni, numcore=6)
+```
+
+As an alternative to the above, run the code for the novel
+spatiotemporal analysis: here you should first compute initial temporal
+covariance component estimates using the `lme_mass_fit_init` function.
+These estimates can then be used to segment the brain into homogeneous
+regions of vertices with similar covariance parameters by using the
+`lme_mass_RgGrow` function. The spatiotemporal model can then be fitted
+by using the `lme_mass_fit_Rgw` function together with the previous
+segmentation and initial covariance estimates. The last function
+(`lme_mass_fit_Rgw`) returns a list (`FitRgw$stats`) of statistical
+estimates (beta weights, their covariances, and others) that can be
+submitted to statistical inference subsequently.
 
 ``` r
 # obtain initial estimates
-outFitInit <- lme_mass_fit_init(X=X, Zcols=1, Y=Y, ni=ni, maskvtx=maskvtx, numcore=12)
+FitInit <- lme_mass_fit_init(X=X, Zcols=Zcols, Y=Y, ni=ni, maskvtx=maskvtx, numcore=6)
 
 # run algorithm to identify spatially homogeneous regions
-outRgGrow <- lme_mass_RgGrow(lh.sphere, outFitInit$Re0, outFitInit$Theta0, maskvtx=maskvtx, nst=2, prc=95)
+RgGrow <- lme_mass_RgGrow(lh.sphere, FitInit$Re0, FitInit$Theta0, maskvtx=maskvtx, nst=2, prc=95)
 
 # fit model
-outFitRgw <- lme_mass_fit_Rgw(X, Zcols, Y, ni, outFitInit$Theta0, outRgGrow$Regions, lh.sphere, prs=12)
+FitRgw <- lme_mass_fit_Rgw(X, Zcols, Y, ni, FitInit$Theta0, RgGrow$Regions, lh.sphere, prs=6)
+```
 
+For both the simple vertex-wise and the novel spatiotemporal analysis,
+it is advisable to run the analyses on machines where multiple cores are
+available, since these mass-univariate analyses can easily take multiple
+hours. Set the number of cores using `numcore` or `prs` options in the
+above functions.
+
+  - Conduct statistical inference
+
+Inference consists of two parts, the calculation of F-values and
+uncorrected p-values, and the correction for multiple comparisons. The
+`lme_mass_F` computes, for every vertex, F- and p-values, and also
+returns the sign of the contrast to get a directional interpretation of
+the F-value (i.e., positive or negative effect). All these values are
+contained in `F_C$F`, `F_C$pval`, and `F_C$sgn`, respectively. Repeat
+this analysis multiple times if you have multiple contrasts.
+
+``` r
 # inference
-F_C1 <- lme_mass_F(outFitRgw$stats, C1)
+F_C <- lme_mass_F(FitRgw$stats, C)
+```
 
-# save
+Multiple comparison correction can be done via classical FDR
+thresholding or via a two-stage FDR procedure, an extension of the
+classical FDR procedure with higher power to detect significant effects.
+For classical FDR thresholding, we submit the output of the `lme_mass_F`
+function to the `lme_mass_FDR` function. This gives an updated threshold
+for uncorrected p-values that keeps the FDR. For the two-stage
+procedure, we submit the output of the `lme_mass_F` function to the
+`lme_mass_FDR2` function. This gives a list (`FDR2_C`) of corrected
+p-values (`FDR2_C$sided_pval`), indices of vertices surviving the
+correction (`FDR2_C$detvtx`), and the new thereshold (`FDR2_C$pth`),
+among others. Also this analysis needs to be run multiple times if you
+have multiple contrasts.
+
+``` r
+# multiple comparison correction using classical FDR
+thr_pFDR  <- lme_mass_FDR(F_C$pval, 0.05)
+
+# multiple comparison correction using two-stage approach
+FDR2_C <- lme_mass_FDR2(F_C$pval, F_C$sgn)
+```
+
+  - Export the results for visualization with Freeview
+
+The last step in this analysis is to export the results for visualzation
+with FreeSurfer’s Freeview program. Three kinds of parameters are
+typically of interest: the statistical parameters (here: F-values) and
+the corrected or uncorrected p-values. We use the `lme_savemgh` function
+for exporting the data, which can the be overlaid onto the corresponding
+(lh or rh) surface of the template brain that was used for the analysis
+(here: `fsaverage`).
+
+Exporting the data requires two things: first, creating an object (here:
+`vol`) that contains the data and some information about the image
+dimensions. Since we are constructing surface overlay files, the
+dimensions will be `(nVertices, 1, 1, 1)`. Second, the overlay data need
+to be extracted from the outputs of the various functions; how this is
+done for each type of parameters is illustrated below.
+
+``` r
+# save F-values
 vol <- NULL
-vol$ndim1 <- length(F_C1$F)
+vol$ndim1 <- length(F_C$F)
 vol$ndim2 <- 1
 vol$ndim3 <- 1
 vol$nframes <- 1
-vol$x <- F_C1$F
+vol$x <- array(data=F_C$F, dim=c(length(F_C$F), 1, 1, 1))
+lme_savemgh(vol=vol, fname=OUTPUT_FILE_NAME)
+
+# save uncorrected p-values
+vol <- NULL
+vol$ndim1 <- length(F_C$pval)
+vol$ndim2 <- 1
+vol$ndim3 <- 1
+vol$nframes <- 1
+vol$x <- array(data=F_C$pval, dim=c(length(F_C$pval), 1, 1, 1))
+lme_savemgh(vol=vol, fname=OUTPUT_FILE_NAME)
+
+# save FDR2-corrected p-values
+vol <- NULL
+vol$ndim1 <- length(FDR2_C$sided_pval)
+vol$ndim2 <- 1
+vol$ndim3 <- 1
+vol$nframes <- 1
+vol$x <- array(data=FDR2_C$sided_pval, dim=c(length(FDR2_C$sided_pval), 1, 1, 1))
 lme_savemgh(vol=vol, fname=OUTPUT_FILE_NAME)
 ```

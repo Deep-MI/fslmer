@@ -3,6 +3,7 @@
 export(lme_F)
 export(lme_fit_FS)
 export(lme_mass_F)
+export(lme_mass_FDR)
 export(lme_mass_FDR2)
 export(lme_mass_RgGrow)
 export(lme_mass_fit_Rgw)

@@ -6,7 +6,7 @@
 #' @param ni Vector indicating the repeated observations of each subject
 #' @param Th0 Output from \code{lme_mass_fit_init}
 #' @param Rgs Output from \code{lme_mass_RgGrow}
-#' @param Surf Spherical surface
+#' @param Surf Spherical surface from \code{lme_readsurf}
 #' @param fname (currently ignored)
 #' @param Dtype Distance (default: euclidean)
 #' @param sptm Spatial measure (default: exp)
@@ -21,7 +21,10 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{fitRgw <- lme_mass_fit_Rgw(X, Zcols, Y, ni, Th0, Rgs, Surf)}
+#' \dontrun{Surf <- lme_readsurf(...)}
+#' \dontrun{fitInit <- lme_mass_fit_init(...)}
+#' \dontrun{RgGrow <- lme_mass_RgGrow(...)}
+#' \dontrun{fitRgw <- lme_mass_fit_Rgw(X, Zcols, Y, ni, fitInit$Theta0, RgGrow$Rgs, Surf)}
 
 lme_mass_fit_Rgw<-function(X,Zcols,Y,ni,Th0,Rgs,Surf,fname=NA,Dtype="euc",sptm="exp",prs=1,e=0.1)
 {

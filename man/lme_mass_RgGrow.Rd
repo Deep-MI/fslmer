@@ -7,7 +7,7 @@
 lme_mass_RgGrow(SphSurf, Re, Theta, maskvtx = NA, nst = 2, prc = 95)
 }
 \arguments{
-\item{SphSurf}{Spherical surface}
+\item{SphSurf}{Spherical surface from \code{lme_readsurf}}
 
 \item{Re}{Output from \code{lme_mass_fit_init}}
 
@@ -26,5 +26,7 @@ A list with spatially homogeneous regions and their means.
 Region-growing algorithm to identify spatially homogeneous regions
 }
 \examples{
-\dontrun{RgGrow <- lme_mass_RgGrow(SphSurf, Re, Theta, maskvtx=NA, nst=2, prc=95)}
+\dontrun{SphSurf <- lme_readsurf(...)}
+\dontrun{fitInit <- lme_mass_fit_init(...)}
+\dontrun{RgGrow <- lme_mass_RgGrow(SphSurf, fitInit$Re0, fitInit$Theta0)}
 }

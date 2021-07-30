@@ -18,7 +18,7 @@
 #' }
 #'
 #' @section Examples:
-#' See the documentation at this \link[../vignettes/example-analyses.html]{vignette}.
+#' Run \code{vignette("example-analyses", package = "fslmer")} to open the documentation for two analysis examples.
 #'
 #' @docType package
 #' @name fslmer

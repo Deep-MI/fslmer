@@ -1,3 +1,19 @@
+#' Write FreeSurfer image (mgh) files
+#'
+#' @param vol List with fields "ndim1", "ndim2", "ndim3", "nframes", which need to contain image dimensions, and "x", which contains the image data.
+#' @param fname Filename
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{vol <- NULL}
+#' \dontrun{vol$ndim1 <- 256}
+#' \dontrun{vol$ndim1 <- 256}
+#' \dontrun{vol$ndim1 <- 160}
+#' \dontrun{vol$ndim1 <- 1}
+#' \dontrun{vol$x <- array(1, dim=c(256, 256, 160, 1))}
+#' \dontrun{lme_savemgh(vol, FILENAME)}
+
 lme_savemgh<-function(vol, fname)
 {
     # R translation of save_mgh.m

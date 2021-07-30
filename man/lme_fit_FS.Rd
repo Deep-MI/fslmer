@@ -18,7 +18,7 @@ lme_fit_FS(X, Zcols, y, ni, e = 10^-3)
 \item{e}{Tolerance (default: 10^-3)}
 }
 \value{
-The function returns list of statistics, with the following entries:
+The function returns stats, a list of statistics, with the following entries:
 Bhat, CovBhat, bihat, Covbihat, phisqhat, SIGMA, W, Dhat, X, Zcols, re,
 ni, and lreml.
 }

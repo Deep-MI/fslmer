@@ -7,7 +7,7 @@
 #' @param e Tolerance (default: 10^-3)
 #'
 #' @return
-#' The function returns list of statistics, with the following entries:
+#' The function returns stats, a list of statistics, with the following entries:
 #' Bhat, CovBhat, bihat, Covbihat, phisqhat, SIGMA, W, Dhat, X, Zcols, re,
 #' ni, and lreml.
 #'

@@ -2,7 +2,7 @@
 % Please edit documentation in R/lme_mass_fit_Rgw.R
 \name{lme_mass_fit_Rgw}
 \alias{lme_mass_fit_Rgw}
-\title{Title}
+\title{Mass-univariate linear mixed-effects model fitting using spatially homogeneous regions}
 \usage{
 lme_mass_fit_Rgw(
   X,
@@ -32,7 +32,7 @@ lme_mass_fit_Rgw(
 
 \item{Rgs}{Output from \code{lme_mass_RgGrow}}
 
-\item{Surf}{Spherical surface}
+\item{Surf}{Spherical surface from \code{lme_readsurf}}
 
 \item{fname}{(currently ignored)}
 
@@ -50,8 +50,11 @@ with the following entries: Bhat, CovBhat, phisqhat, Dhat, Zcols, invEI,
 Pth, Qthth, lreml
 }
 \description{
-Title
+Mass-univariate linear mixed-effects model fitting using spatially homogeneous regions
 }
 \examples{
-\dontrun{fitRgw <- lme_mass_fit_Rgw(X, Zcols, Y, ni, Th0, Rgs, Surf)}
+\dontrun{Surf <- lme_readsurf(...)}
+\dontrun{fitInit <- lme_mass_fit_init(...)}
+\dontrun{RgGrow <- lme_mass_RgGrow(...)}
+\dontrun{fitRgw <- lme_mass_fit_Rgw(X, Zcols, Y, ni, fitInit$Theta0, RgGrow$Rgs, Surf)}
 }

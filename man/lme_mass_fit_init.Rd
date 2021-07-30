@@ -20,11 +20,12 @@ lme_mass_fit_init(X, Zcols, Y, ni, maskvtx = NA, numcore = 1)
 \item{numcore}{Number of cores for parallel computing (default: 1)}
 }
 \value{
-The function returns an initial model fit, i.e. a list with entries Bhat, Theta, and Re.
+The function returns an initial model fit, i.e. a list with entries Bhat0,
+Theta0, and Re0.
 }
 \description{
 Initialize model fit
 }
 \examples{
-\dontrun{fitInit <- lme_mass_fit_init(X, Zcols, y=y, ni)}
+\dontrun{fitInit <- lme_mass_fit_init(X, Zcols, Y, ni)}
 }

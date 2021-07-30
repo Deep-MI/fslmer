@@ -9,8 +9,8 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{stats <- lme_fit_FS(X, Zcols, y, ni)}
-#' \dontrun{C <- c(0, 1, 0, 0)}
+#' \dontrun{stats <- lme_fit_FS(...)}
+#' \dontrun{C <- matrix(c(0, 1, 0, 0), nrow=1)}
 #' \dontrun{F <- lme_F(stats, C)}
 
 lme_F<-function(stats, C) {

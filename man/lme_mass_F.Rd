@@ -7,7 +7,7 @@
 lme_mass_F(stats, C)
 }
 \arguments{
-\item{stats}{Model fit as returned by \code{^lme_mass_fit_Rgw}}
+\item{stats}{Model fit as returned by \code{lme_mass_fit_Rgw}}
 
 \item{C}{Contrast vector}
 }

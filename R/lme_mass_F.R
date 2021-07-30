@@ -1,6 +1,6 @@
 #' Estimate F statistics for many vertices
 #'
-#' @param stats Model fit as returned by \code{^lme_mass_fit_Rgw}
+#' @param stats Model fit as returned by \code{lme_mass_fit_Rgw}
 #' @param C Contrast vector
 #'
 #' @return

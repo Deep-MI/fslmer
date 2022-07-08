@@ -15,18 +15,19 @@
 
 lme_mass_F<-function(stats, C) {
 
-    nv<-length(stats)
+    nv <- length(stats)
 
-    Fval<-NULL
-    pval<-NULL
-    sgn<-NULL
-    df<-matrix(nrow=2,ncol=nv)
+    Fval <- NULL
+    pval <- NULL
+    sgn <- NULL
+    df <- matrix(nrow=2,ncol=nv)
 
-    fstats<-NULL
+    fstats <- NULL
+    count_failed <- 0
 
     for (i in c(1:nv)) {
 
-        if (!(any(is.na(stats[[i]]$Bhat)))) {
+        if ( (!is.null(stats[[i]])) && (!(any(is.na(stats[[i]]$Bhat))))) {
             Bhat = stats[[i]]$Bhat
             Zcols = stats[[i]]$Zcols
             q = length(Zcols)
@@ -93,6 +94,7 @@ lme_mass_F<-function(stats, C) {
             contrast = NA
             sgn[i] = NA
             df[,i] = NA
+            count_failed = count_failed + 1
         }
     }
 
@@ -100,6 +102,8 @@ lme_mass_F<-function(stats, C) {
     fstats$pval = pval
     fstats$sgn = sgn
     fstats$df = df
+
+    print(paste0("Did not run for ", count_failed, " out of ", nv, " vertices"), quote=F)
 
     return(fstats)
 

@@ -191,12 +191,14 @@ longitudinal qdec table to automatically find the longitudinally
 processed data and assembles it into a single `lh.thickness.mgh` file.
 Note that it is possible to use a different study template than the
 standard fsaverage template, and that other measures than thickness can
-be used as well (see the help for mris\_preproc).
+be used as well (see the help for
+    mris\_preproc).
 
     mris_preproc --qdec-long PATH_TO_QDEC_TABLE/qdec.table.dat --target fsaverage --hemi lh --meas thickness --out lh.thickness.mgh
 
 The next step is to smooth the data; here we use a 10 mm FWHM kernel.
-The resulting file will be `lh.thickness_sm10.mgh`.
+The resulting file will be
+    `lh.thickness_sm10.mgh`.
 
     mri_surf2surf --hemi lh --s fsaverage --sval lh.thickness.mgh --tval lh.thickness_sm10.mgh --fwhm-trg 10 --cortex --noreshape
 
@@ -310,6 +312,35 @@ available, since these mass-univariate analyses can easily take multiple
 hours. Set the number of cores using `numcore` or `prs` options in the
 above functions.
 
+As an optional step, estimate the random-effects coefficients per each
+vertex, for example the random intercept and random slope at each
+location. This is not required for further analysis, but might be
+interesting nevertheless. Note that this can take a long time (i.e. a
+few hours). The output is a list of lists, where the sub-list ‘Rfx’
+contains the estimated subject-specific random effects matrix (nSubjects
+x (nRandomEffectsnrfx\*nVertices)). The columns of this matrix are
+grouped by vertex. For example if there are two random effects in the
+model, then the first two columns contain the subject-specific random
+effect coefficients for the first vertex, then the next two columns
+contain the subject-specific random effect coefficients for the second
+vertex and so on.
+
+``` r
+rfx <- lme_mass_rfx(fitRgw$stats, X, Zcols, Y, ni, maskvtx)
+```
+
+The `lme_mass_rfx` function returns the subject-specific random effects
+estimates at each vertex. The output is a list of lists, with the
+following entries: - `Rfx`: Estimated subject-especific random effects
+matrix (m x nrfx\*nv). The columns of this matrix are grouped by vertex.
+For example if there are two random effects % in the model then the
+first two columns contain the subject-specific random effect
+coefficients for the first vertex, then the next two columns contain the
+subject-specific random effect coefficients for the second vertex etc. -
+`nrfx`: Number of random effects (length(Zcols)). - `Bhat`:
+Population-level regression coefficients in `stats`, stacked in one
+matrix.
+
   - Conduct statistical inference
 
 Inference consists of two parts, the calculation of F-values and
@@ -391,3 +422,8 @@ vol$nframes <- 1
 vol$x <- array(data=FDR2_C$sided_pval, dim=c(length(FDR2_C$sided_pval), 1, 1, 1))
 lme_savemgh(vol=vol, fname=OUTPUT_FILE_NAME)
 ```
+
+  - Further analysis
+
+For further analysis such as extracting clusters and getting cluster
+statistics, we recommend using FreeSurfer’s `mri_surfcluster` program.

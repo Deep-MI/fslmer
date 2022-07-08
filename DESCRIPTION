@@ -1,7 +1,7 @@
 Package: fslmer
 Title: Univariate And Mass-Univariate Linear Mixed-Effects Analysis For FreeSurfer Imaging Data
-Version: 0.0.0.9000
-Date: 2021-07-30
+Version: 0.0.0.9001
+Date: 2022-07-04
 Authors@R: c(
     person(given = "Kersten",
            family = "Diers",
@@ -18,10 +18,11 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Imports: 
     MASS,
     parallel,
+    bettermc,
     stats
 Suggests: 
     knitr,

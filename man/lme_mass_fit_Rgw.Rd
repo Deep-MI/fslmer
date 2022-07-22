@@ -54,7 +54,7 @@ Mass-univariate linear mixed-effects model fitting using spatially homogeneous r
 }
 \examples{
 \dontrun{Surf <- lme_readsurf(...)}
-\dontrun{fitInit <- lme_mass_fit_init(...)}
+\dontrun{FitInit <- lme_mass_fit_init(...)}
 \dontrun{RgGrow <- lme_mass_RgGrow(...)}
-\dontrun{fitRgw <- lme_mass_fit_Rgw(X, Zcols, Y, ni, fitInit$Theta0, RgGrow$Rgs, Surf)}
+\dontrun{fitRgw <- lme_mass_fit_Rgw(X, Zcols, Y, ni, FitInit$Theta0, RgGrow$Regions, Surf)}
 }

@@ -29,7 +29,7 @@ lme_mass_rfx <- function(stats, X, Zcols, Y, ni, maskvtx=NA, prs=1){
     do_estimate <- function(j, stats, X, Zcols, maskvtx, nrfx, m){
 
         #
-        print(paste0("Extracting coefficients at vertex ", j))
+        print(paste0("Extracting coefficients at vertex ", j), quote=F)
 
         #
         tryCatch({
@@ -41,22 +41,23 @@ lme_mass_rfx <- function(stats, X, Zcols, Y, ni, maskvtx=NA, prs=1){
                 scInvD <- solve(D) * phisq
                 ijcol <- (maskvtx[j]-1) * nrfx + 1
                 fjcol <- ijcol + nrfx - 1
+                Rfxj <- matrix(0, nrow=m, ncol=nrfx)
                 for (i in c(1:m)) {
                     posf <- posi + ni[i] - 1
                     Zi <- X[posi:posf, Zcols, drop=F]
                     Wi <- (diag(ni[i]) - (lme_mrdivide(Zi, ((t(Zi)%*%Zi) + scInvD), ginv.do=F)%*%t(Zi))) / phisq
                     ri <- r[posi:posf]
-                    Rfx[i, ijcol:fjcol] <- t(D%*%t(Zi)%*%Wi%*%ri)
+                    Rfxj[i, ] <- t(D%*%t(Zi)%*%Wi%*%ri)
                     posi <- posf + 1
                 }
-                Bhat[, maskvtx[j]] <- stats[[maskvtx[j]]]$Bhat[Zcols]
+                Bhatj <- stats[[maskvtx[j]]]$Bhat[Zcols]
             }
         },
         error=function(e){print(paste("Vertex ", j, ': did not run: ', e, sep=""), quote=F)}
         )
 
         #
-        return(list(Bhat=Bhat, Rfx=Rfx))
+        return(list(Bhatj=Bhatj, Rfxj=Rfxj, ijcol=ijcol, fjcol=fjcol, maskvtxj=maskvtx[j]))
     }
 
     # Initialization
@@ -64,7 +65,7 @@ lme_mass_rfx <- function(stats, X, Zcols, Y, ni, maskvtx=NA, prs=1){
     print('Initialization ...', quote = F)
 
     nv0 <-  dim(Y)[2]
-    if (is.na(maskvtx)) {maskvtx <- seq(1, nv0)}
+    if (any(is.na(maskvtx))) {maskvtx <- seq(1, nv0)}
     m <- length(ni)
     nrfx <- length(Zcols)
     Rfx <- matrix(0, nrow=m, ncol=nv0*nrfx)
@@ -76,21 +77,24 @@ lme_mass_rfx <- function(stats, X, Zcols, Y, ni, maskvtx=NA, prs=1){
 
     if (prs > 1)
     {
-        outEst <- bettermc::mclapply(c(1:length(maskvtx)), function(x)
-        {
+        outEst <- bettermc::mclapply(c(1:length(maskvtx)), function(x) {
             do_estimate(x, stats, X, Zcols, maskvtx, nrfx, m)
-        }, mc.cores = prs, mc.progress=TRUE, mc.stdout="output")
-
+        }, mc.cores = prs, mc.progress=FALSE, mc.stdout="output")
+        for (j in c(1:length(maskvtx))) {
+            Rfx[, outEst[[j]]$ijcol:outEst[[j]]$fjcol] <- outEst[[j]]$Rfxj
+            Bhat[, outEst[[j]]$maskvtxj] <- outEst[[j]]$Bhatj
+        }
+        rm(outEst)
     }
     else
     {
-        outEst <- list()
         for (j in c(1:length(maskvtx))) {
-            outEst <- c(outEst, do_estimate(x, stats, X, Zcols, maskvtx, nrfx, m))
+            outEst <- do_estimate(j, stats, X, Zcols, maskvtx, nrfx, m)
+            Rfx[, outEst$ijcol:outEst$fjcol] <- outEst$Rfxj
+            Bhat[, outEst$maskvtxj] <- outEst$Bhatj
+            rm(outEst)
         }
     }
-
-    browser()
 
     # Output
 

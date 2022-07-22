@@ -38,15 +38,6 @@ If you use these tools in your analysis please cite:
     NeuroImage 61, 1402-1418, 2012,
     <http://dx.doi.org/10.1016/j.neuroimage.2012.02.084>
 
-## Bug-fixes
-
-In version 0.0.0.9002, a bug was fixed in the lme_mass_fit_Rgw() function that 
-resulted in an incorrect assignment of the model estimates to the `stats` output 
-structure in situations where the model could not be estimated and returned a NULL 
-value. As a consequence, the ordering of vertices was not reliable, and anatomical 
-inferences should be drawn with caution. It is recommended to re-run the updated
-lme_mass_fit_Rgw() version (version 0.0.0.9002 or newer).
-
 ## Installation
 
 You can install fslmer from [GitHub](https://github.com/) with:
@@ -200,12 +191,14 @@ longitudinal qdec table to automatically find the longitudinally
 processed data and assembles it into a single `lh.thickness.mgh` file.
 Note that it is possible to use a different study template than the
 standard fsaverage template, and that other measures than thickness can
-be used as well (see the help for mris\_preproc).
+be used as well (see the help for
+    mris\_preproc).
 
     mris_preproc --qdec-long PATH_TO_QDEC_TABLE/qdec.table.dat --target fsaverage --hemi lh --meas thickness --out lh.thickness.mgh
 
 The next step is to smooth the data; here we use a 10 mm FWHM kernel.
-The resulting file will be `lh.thickness_sm10.mgh`.
+The resulting file will be
+    `lh.thickness_sm10.mgh`.
 
     mri_surf2surf --hemi lh --s fsaverage --sval lh.thickness.mgh --tval lh.thickness_sm10.mgh --fwhm-trg 10 --cortex --noreshape
 
@@ -333,18 +326,18 @@ contain the subject-specific random effect coefficients for the second
 vertex and so on.
 
 ``` r
-rfx <- lme_mass_rfx(fitRgw$stats, X, Zcols, Y, ni, maskvtx)
+rfx <- lme_mass_rfx(FitRgw$stats, X, Zcols, Y, ni, maskvtx)
 ```
 
 The `lme_mass_rfx` function returns the subject-specific random effects
 estimates at each vertex. The output is a list of lists, with the
-following entries: (1) `Rfx`: Estimated subject-especific random effects
+following entries: - `Rfx`: Estimated subject-especific random effects
 matrix (m x nrfx\*nv). The columns of this matrix are grouped by vertex.
-For example if there are two random effects in the model, then the
+For example if there are two random effects % in the model then the
 first two columns contain the subject-specific random effect
 coefficients for the first vertex, then the next two columns contain the
-subject-specific random effect coefficients for the second vertex etc. (2)
-`nrfx`: Number of random effects (length(Zcols)). (3) `Bhat`:
+subject-specific random effect coefficients for the second vertex etc. -
+`nrfx`: Number of random effects (length(Zcols)). - `Bhat`:
 Population-level regression coefficients in `stats`, stacked in one
 matrix.
 

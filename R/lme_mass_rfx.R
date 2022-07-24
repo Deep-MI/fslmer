@@ -32,6 +32,12 @@ lme_mass_rfx <- function(stats, X, Zcols, Y, ni, maskvtx=NA, prs=1){
         print(paste0("Extracting coefficients at vertex ", j), quote=F)
 
         #
+        Bhatj <- NULL
+        Rfxj <- NULL
+        ijcol <- NULL
+        fjcol <- NULL
+
+        #
         tryCatch({
             if ((!is.null(stats[[maskvtx[j]]])) && (!is.na(stats[[maskvtx[j]]]$Bhat)) && (!is.na(stats[[maskvtx[j]]]$Dhat)) && (!is.na(stats[[maskvtx[j]]]$phisqhat))) {
                 D <- stats[[maskvtx[j]]]$Dhat
@@ -81,8 +87,8 @@ lme_mass_rfx <- function(stats, X, Zcols, Y, ni, maskvtx=NA, prs=1){
             do_estimate(x, stats, X, Zcols, maskvtx, nrfx, m)
         }, mc.cores = prs, mc.progress=FALSE, mc.stdout="output")
         for (j in c(1:length(maskvtx))) {
-            Rfx[, outEst[[j]]$ijcol:outEst[[j]]$fjcol] <- outEst[[j]]$Rfxj
-            Bhat[, outEst[[j]]$maskvtxj] <- outEst[[j]]$Bhatj
+            if (!is.null(outEst[[j]]$Rfxj)) { Rfx[, outEst[[j]]$ijcol:outEst[[j]]$fjcol] <- outEst[[j]]$Rfxj }
+            if (!is.null(outEst[[j]]$Bhatj)) { Bhat[, outEst[[j]]$maskvtxj] <- outEst[[j]]$Bhatj }
         }
         rm(outEst)
     }
@@ -90,8 +96,8 @@ lme_mass_rfx <- function(stats, X, Zcols, Y, ni, maskvtx=NA, prs=1){
     {
         for (j in c(1:length(maskvtx))) {
             outEst <- do_estimate(j, stats, X, Zcols, maskvtx, nrfx, m)
-            Rfx[, outEst$ijcol:outEst$fjcol] <- outEst$Rfxj
-            Bhat[, outEst$maskvtxj] <- outEst$Bhatj
+            if (!is.null(outEst$Rfxj)) { Rfx[, outEst$ijcol:outEst$fjcol] <- outEst$Rfxj }
+            if (!is.null(outEst$Bhatj)) { Bhat[, outEst$maskvtxj] <- outEst$Bhatj }
             rm(outEst)
         }
     }

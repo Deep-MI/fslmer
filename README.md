@@ -4,7 +4,6 @@
 # fslmer
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 ## Overview
@@ -22,18 +21,18 @@ code, see the original repository at
 
 If you use these tools in your analysis please cite:
 
-  - Bernal-Rusiel J.L., Greve D.N., Reuter M., Fischl B., Sabuncu M.R.,
-    2012. Statistical Analysis of Longitudinal Neuroimage Data with
-    Linear Mixed Effects Models, NeuroImage 66, 249-260, 2012,
+-   Bernal-Rusiel J.L., Greve D.N., Reuter M., Fischl B., Sabuncu
+    M.R., 2012. Statistical Analysis of Longitudinal Neuroimage Data
+    with Linear Mixed Effects Models, NeuroImage 66, 249-260, 2012,
     <https://dx.doi.org/10.1016%2Fj.neuroimage.2012.10.065>
 
-  - Bernal-Rusiel J.L., Greve D.N., Reuter M., Fischl B., Sabuncu M.R.,
-    2013. Spatiotemporal Linear Mixed Effects Modeling for the
+-   Bernal-Rusiel J.L., Greve D.N., Reuter M., Fischl B., Sabuncu
+    M.R., 2013. Spatiotemporal Linear Mixed Effects Modeling for the
     Mass-univariate Analysis of Longitudinal Neuroimage Data, NeuroImage
     81, 358–370, 2013,
     <https://doi.org/10.1016/j.neuroimage.2013.05.049>
 
-  - Reuter M., Schmansky N.J., Rosas H.D., Fischl B, 2012.Within-Subject
+-   Reuter M., Schmansky N.J., Rosas H.D., Fischl B, 2012.Within-Subject
     Template Estimation for Unbiased Longitudinal Image Analysis,
     NeuroImage 61, 1402-1418, 2012,
     <http://dx.doi.org/10.1016/j.neuroimage.2012.02.084>
@@ -58,7 +57,7 @@ longitudinal analysis pipeline.
 
 ### Univariate analyses
 
-  - Loading the data
+-   Loading the data
 
 Usually you should already have a longitudinal Qdec table, which
 contains the subject IDs, image/observation/session IDs, time, and
@@ -71,7 +70,7 @@ directory:
 
     asegstats2table --qdec-long PATH_TO_QDEC_TABLE/qdec.table.dat -t PATH_TO_ANALYSIS_DIRECTORY/aseg.long.table
 
-  - Preparing the data
+-   Preparing the data
 
 Your longitudinal Qdec table needs to contain the “fsid-base” (subject
 ID) columns and “fsid” (image/observation/session ID), and should
@@ -124,7 +123,7 @@ Y <- matrix(dat$Left.Hippocampus, ncol=1)
 ni <- matrix(unname(table(dat$fsid.base)), ncol=1)
 ```
 
-  - Creating the design matrix and contrasts
+-   Creating the design matrix and contrasts
 
 Once you have your ordered data, you need to build your design matrix.
 As an example, a simple linear model containing a group by time
@@ -150,7 +149,7 @@ of columns in the model matrix.
 C <- matrix(c(0, 0, 0, 1), nrow=1)
 ```
 
-  - Estimating the model and conducting statistical inference
+-   Estimating the model and conducting statistical inference
 
 Estimate the model by using the `lme_fit_FS` function: The arguments
 `X`, `Y`, and `ni` have been defined before, and `Zcols` is a vector
@@ -191,18 +190,16 @@ longitudinal qdec table to automatically find the longitudinally
 processed data and assembles it into a single `lh.thickness.mgh` file.
 Note that it is possible to use a different study template than the
 standard fsaverage template, and that other measures than thickness can
-be used as well (see the help for
-    mris\_preproc).
+be used as well (see the help for mris_preproc).
 
     mris_preproc --qdec-long PATH_TO_QDEC_TABLE/qdec.table.dat --target fsaverage --hemi lh --meas thickness --out lh.thickness.mgh
 
 The next step is to smooth the data; here we use a 10 mm FWHM kernel.
-The resulting file will be
-    `lh.thickness_sm10.mgh`.
+The resulting file will be `lh.thickness_sm10.mgh`.
 
     mri_surf2surf --hemi lh --s fsaverage --sval lh.thickness.mgh --tval lh.thickness_sm10.mgh --fwhm-trg 10 --cortex --noreshape
 
-  - Loading the data
+-   Loading the data
 
 The `lh.thickness_sm10.mgh` file as well as a set of associated files
 will next be read into R.
@@ -221,7 +218,7 @@ lh.sphere <- lme_readsurf("/PATH/TO/FREESURFER/DIRECTORY/subjects/fsaverage/surf
 lh.cortex <- lme_readlabel("/PATH/TO/FREESURFER/DIRECTORY/subjects/fsaverage/label/lh.cortex.label")[,1]
 ```
 
-  - Preparing the data
+-   Preparing the data
 
 The data is prepared in a similar way as for the univariate analysis. We
 just repeat the code here with minimal comments, see above for an
@@ -244,7 +241,7 @@ Y <- t(drop(lh.thickness$x))
 maskvtx <- sort(lh.cortex)+1
 ```
 
-  - Creating the design matrix and contrasts
+-   Creating the design matrix and contrasts
 
 Also the design matrix and the contrasts are constructed in the same way
 as for the univariate analysis. Again, we just repeat the code here.
@@ -262,7 +259,7 @@ C <- matrix(c(0, 0, 0, 1), nrow=1)
 Zcols <- c(1, 2) # random-slope, random-intercept
 ```
 
-  - Estimate the model
+-   Estimate the model
 
 There two ways to estimate the model in the mass-univariate analysis.
 The first one is a simple vertex-wise analysis, and the second one is a
@@ -316,32 +313,34 @@ As an optional step, estimate the random-effects coefficients per each
 vertex, for example the random intercept and random slope at each
 location. This is not required for further analysis, but might be
 interesting nevertheless. Note that this can take a long time (i.e. a
-few hours). The output is a list of lists, where the sub-list ‘Rfx’
-contains the estimated subject-specific random effects matrix (nSubjects
-x (nRandomEffectsnrfx\*nVertices)). The columns of this matrix are
-grouped by vertex. For example if there are two random effects in the
-model, then the first two columns contain the subject-specific random
-effect coefficients for the first vertex, then the next two columns
-contain the subject-specific random effect coefficients for the second
-vertex and so on.
+few hours) if using it on a single core. To run it in parallel on
+multiple cores on your system, set `prs` to a number higher than one.
 
 ``` r
-rfx <- lme_mass_rfx(FitRgw$stats, X, Zcols, Y, ni, maskvtx)
+rfx <- lme_mass_rfx(FitRgw$stats, X, Zcols, Y, ni, maskvtx, prs=1)
 ```
 
 The `lme_mass_rfx` function returns the subject-specific random effects
 estimates at each vertex. The output is a list of lists, with the
-following entries: - `Rfx`: Estimated subject-especific random effects
-matrix (m x nrfx\*nv). The columns of this matrix are grouped by vertex.
-For example if there are two random effects % in the model then the
-first two columns contain the subject-specific random effect
-coefficients for the first vertex, then the next two columns contain the
-subject-specific random effect coefficients for the second vertex etc. -
-`nrfx`: Number of random effects (length(Zcols)). - `Bhat`:
-Population-level regression coefficients in `stats`, stacked in one
-matrix.
+following entries:
 
-  - Conduct statistical inference
+-   `Rfx`: Estimated subject-especific random effects matrix
+    `(number of cases,  number of ranom effects * number of vertices)`.
+    The columns of this matrix are grouped by vertex: for example, if
+    there are two random effects in the model, then the first two
+    columns contain the subject-specific random effect coefficients for
+    the first vertex, then the next two columns contain the
+    subject-specific random effect coefficients for the second vertex,
+    etc.
+-   `Bhat`: Population-level regression coefficients corresponding to
+    the random effects (same as in `FitRgw$stats`), stacked in one
+    matrix.
+-   `nrfx`: Number of random effects.
+
+We illustrate the prediction of individual values from model estimates
+in a [separate document](Examples.md).
+
+-   Conduct statistical inference
 
 Inference consists of two parts, the calculation of F-values and
 uncorrected p-values, and the correction for multiple comparisons. The
@@ -377,7 +376,7 @@ thr_pFDR  <- lme_mass_FDR(F_C$pval, 0.05)
 FDR2_C <- lme_mass_FDR2(F_C$pval, F_C$sgn)
 ```
 
-  - Export the results for visualization with Freeview
+-   Export the results for visualization with Freeview
 
 The last step in this analysis is to export the results for
 visualization with FreeSurfer’s Freeview program. Three kinds of
@@ -423,7 +422,7 @@ vol$x <- array(data=FDR2_C$sided_pval, dim=c(length(FDR2_C$sided_pval), 1, 1, 1)
 lme_savemgh(vol=vol, fname=OUTPUT_FILE_NAME)
 ```
 
-  - Further analysis
+-   Further analysis
 
 For further analysis such as extracting clusters and getting cluster
 statistics, we recommend using FreeSurfer’s `mri_surfcluster` program.

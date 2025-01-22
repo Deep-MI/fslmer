@@ -10,7 +10,7 @@
 ## Overview
 
 The `fslmer` package provides univariate and mass-univariate linear
-mixed-effects analysis for FreeSurfer imaging data. It is a port of
+mixed-effects analysis for [FastSurfer](http://fastsurfer.org) and FreeSurfer imaging data. It is a port of
 Freesurfer’s Matlab-based LME tools to the R programming language.
 
 Please refer to the original documentation at
